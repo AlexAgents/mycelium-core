@@ -1,0 +1,31 @@
+@startuml
+!include ../_common/theme.iuml
+
+title State Diagram - SessionContext States
+
+[*] --> NotInitialized
+
+state NotInitialized {
+  NotInitialized : - session_id is None
+  NotInitialized : - contract_address is None
+}
+
+NotInitialized --> SetupStage : create_session() [session_id created]
+
+state SetupStage {
+  SetupStage : - contract_address is None
+  SetupStage : - candidate_list is empty
+  SetupStage : - UI: Deploy button is active
+}
+
+SetupStage --> ContractDeployed : deploy_contract()
+
+state ContractDeployed {
+  ContractDeployed : - contract_address is valid
+  ContractDeployed : - UI: Deploy button is disabled
+}
+
+ContractDeployed --> NotInitialized : new_session() [archives old session]
+ContractDeployed --> NotInitialized : reset_blockchain_data() [chain deleted + new session]
+
+@enduml

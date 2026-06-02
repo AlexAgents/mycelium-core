@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_mass" targetNamespace="http://mycelium.core/bpmn/mass" exporter="Camunda Modeler" exporterVersion="5.46.1">
+  <bpmn:collaboration id="Collab_mass">
+    <bpmn:participant id="Pool_Admin" name="Administrator (VoteTab)" processRef="Proc_Admin" />
+    <bpmn:participant id="Pool_Worker" name="MassVoteWorker (Background Thread)" processRef="Proc_Worker" />
+    <bpmn:messageFlow id="MF_start" name="Voter list + candidate list" sourceRef="T_A_Confirm" targetRef="T_W_Init" />
+    <bpmn:messageFlow id="MF_result" name="Summary results" sourceRef="T_W_Summary" targetRef="T_A_Toast" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Admin" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1pqxrv9" />
+    <bpmn:startEvent id="SE_A" name="Админ нажимает Mass Vote" />
+    <bpmn:exclusiveGateway id="GW_Src" name="Источник?" />
+    <bpmn:sequenceFlow id="fa1" sourceRef="SE_A" targetRef="GW_Src" />
+    <bpmn:sequenceFlow id="fa2" name="JSON" sourceRef="GW_Src" targetRef="T_A_JSON" />
+    <bpmn:sequenceFlow id="fa3" name="Session" sourceRef="GW_Src" targetRef="T_A_Session" />
+    <bpmn:sequenceFlow id="fa4" sourceRef="T_A_JSON" targetRef="T_A_Confirm" />
+    <bpmn:sequenceFlow id="fa5" sourceRef="T_A_Session" targetRef="T_A_Confirm" />
+    <bpmn:sequenceFlow id="fa6" sourceRef="T_A_Confirm" targetRef="T_A_Toast" />
+    <bpmn:sequenceFlow id="fa7" sourceRef="T_A_Toast" targetRef="EE_A" />
+    <bpmn:endEvent id="EE_A" name="Массовое голосование завершено" />
+    <bpmn:userTask id="T_A_Toast" name="Toast результатов&#10;(успех / пропуск / ошибка)" />
+    <bpmn:userTask id="T_A_Confirm" name="Подтверждение&#10;(избиратели × кандидаты)" />
+    <bpmn:userTask id="T_A_Session" name="Избиратели из&#10;текущей сессии" />
+    <bpmn:userTask id="T_A_JSON" name="Выбрать JSON файл&#10;с избирателями" />
+  </bpmn:process>
+  <bpmn:process id="Proc_Worker" isExecutable="false">
+    <bpmn:startEvent id="SE_W" name="Worker запущен" />
+    <bpmn:serviceTask id="T_W_Init" name="Получение списков&#10;избирателей и кандидатов" />
+    <bpmn:serviceTask id="T_W_Loop" name="Для каждого избирателя:" />
+    <bpmn:exclusiveGateway id="GW_Key" name="Есть приватный ключ?" />
+    <bpmn:serviceTask id="T_W_WL" name="Проверка whitelist" />
+    <bpmn:exclusiveGateway id="GW_WL" name="В whitelist?" />
+    <bpmn:serviceTask id="T_W_Voted" name="Проверка has_voted" />
+    <bpmn:exclusiveGateway id="GW_Voted" name="Уже голосовал?" />
+    <bpmn:serviceTask id="T_W_Balance" name="Проверка баланса&#10;≥ 0.0003 ETH" />
+    <bpmn:exclusiveGateway id="GW_Bal" name="Достаточно?" />
+    <bpmn:serviceTask id="T_W_Vote" name="cast_vote()&#10;(случайный кандидат)" />
+    <bpmn:exclusiveGateway id="GW_TX" name="TX успешна?" />
+    <bpmn:sequenceFlow id="fw1" sourceRef="SE_W" targetRef="T_W_Init" />
+    <bpmn:sequenceFlow id="fw2" sourceRef="T_W_Init" targetRef="T_W_Loop" />
+    <bpmn:sequenceFlow id="fw3" sourceRef="T_W_Loop" targetRef="GW_Key" />
+    <bpmn:sequenceFlow id="fw4" name="Нет" sourceRef="GW_Key" targetRef="T_W_SkipKey" />
+    <bpmn:sequenceFlow id="fw5" name="Да" sourceRef="GW_Key" targetRef="T_W_WL" />
+    <bpmn:sequenceFlow id="fw6" sourceRef="T_W_WL" targetRef="GW_WL" />
+    <bpmn:sequenceFlow id="fw7" name="Нет" sourceRef="GW_WL" targetRef="T_W_SkipWL" />
+    <bpmn:sequenceFlow id="fw8" name="Да" sourceRef="GW_WL" targetRef="T_W_Voted" />
+    <bpmn:sequenceFlow id="fw9" sourceRef="T_W_Voted" targetRef="GW_Voted" />
+    <bpmn:sequenceFlow id="fw10" name="Да" sourceRef="GW_Voted" targetRef="T_W_SkipVoted" />
+    <bpmn:sequenceFlow id="fw11" name="Нет" sourceRef="GW_Voted" targetRef="T_W_Balance" />
+    <bpmn:sequenceFlow id="fw12" sourceRef="T_W_Balance" targetRef="GW_Bal" />
+    <bpmn:sequenceFlow id="fw13" name="Нет" sourceRef="GW_Bal" targetRef="T_W_SkipBal" />
+    <bpmn:sequenceFlow id="fw14" name="Да" sourceRef="GW_Bal" targetRef="T_W_Vote" />
+    <bpmn:sequenceFlow id="fw15" sourceRef="T_W_Vote" targetRef="GW_TX" />
+    <bpmn:sequenceFlow id="fw16" name="OK" sourceRef="GW_TX" targetRef="T_W_OK" />
+    <bpmn:sequenceFlow id="fw17" name="Error" sourceRef="GW_TX" targetRef="T_W_Fail" />
+    <bpmn:sequenceFlow id="fw18" sourceRef="T_W_OK" targetRef="T_W_Summary" />
+    <bpmn:sequenceFlow id="fw20" sourceRef="T_W_SkipKey" targetRef="T_W_Summary" />
+    <bpmn:sequenceFlow id="fw21" sourceRef="T_W_SkipWL" targetRef="T_W_Summary" />
+    <bpmn:sequenceFlow id="fw23" sourceRef="T_W_SkipBal" targetRef="T_W_Summary" />
+    <bpmn:sequenceFlow id="fw24" sourceRef="T_W_Summary" targetRef="EE_W" />
+    <bpmn:sequenceFlow id="fw22" sourceRef="T_W_SkipVoted" targetRef="T_W_Summary" />
+    <bpmn:sequenceFlow id="fw19" sourceRef="T_W_Fail" targetRef="T_W_Summary" />
+    <bpmn:serviceTask id="T_W_Fail" name="failed++&#10;Логировать ошибку">
+      <bpmn:outgoing>fw19</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_W_SkipBal" name="Пропуск: низкий баланс" />
+    <bpmn:serviceTask id="T_W_SkipVoted" name="Пропуск: уже голосовал">
+      <bpmn:outgoing>fw22</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_W_Summary" name="Сборка сводки&#10;{voted, skipped, failed}">
+      <bpmn:incoming>fw22</bpmn:incoming>
+      <bpmn:incoming>fw20</bpmn:incoming>
+      <bpmn:incoming>fw19</bpmn:incoming>
+      <bpmn:incoming>fw23</bpmn:incoming>
+      <bpmn:incoming>fw18</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_W_SkipWL" name="Пропуск: не в WL" />
+    <bpmn:serviceTask id="T_W_SkipKey" name="Пропуск: нет ключа" />
+    <bpmn:serviceTask id="T_W_OK" name="voted++&#10;Логировать TX hash" />
+    <bpmn:endEvent id="EE_W" name="finished.emit(summary)" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_mass">
+    <bpmndi:BPMNPlane id="Plane_mass" bpmnElement="Collab_mass">
+      <bpmndi:BPMNShape id="Pool_Admin_di" bpmnElement="Pool_Admin" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1700" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_A_di" bpmnElement="SE_A">
+        <dc:Bounds x="210" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Src_di" bpmnElement="GW_Src" isMarkerVisible="true">
+        <dc:Bounds x="295" y="135" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="248.5" y="133" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_A_di" bpmnElement="EE_A">
+        <dc:Bounds x="1672" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1665" y="178" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Toast_di" bpmnElement="T_A_Toast">
+        <dc:Bounds x="1395" y="120" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Confirm_di" bpmnElement="T_A_Confirm">
+        <dc:Bounds x="915" y="120" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Session_di" bpmnElement="T_A_Session">
+        <dc:Bounds x="515" y="170" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_JSON_di" bpmnElement="T_A_JSON">
+        <dc:Bounds x="515" y="80" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fa1_di" bpmnElement="fa1">
+        <di:waypoint x="246" y="160" />
+        <di:waypoint x="295" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa2_di" bpmnElement="fa2">
+        <di:waypoint x="320" y="135" />
+        <di:waypoint x="320" y="115" />
+        <di:waypoint x="515" y="115" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="335" y="123" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa3_di" bpmnElement="fa3">
+        <di:waypoint x="320" y="185" />
+        <di:waypoint x="320" y="205" />
+        <di:waypoint x="515" y="205" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="330" y="185" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa4_di" bpmnElement="fa4">
+        <di:waypoint x="645" y="115" />
+        <di:waypoint x="790" y="115" />
+        <di:waypoint x="790" y="160" />
+        <di:waypoint x="915" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa5_di" bpmnElement="fa5">
+        <di:waypoint x="645" y="205" />
+        <di:waypoint x="790" y="205" />
+        <di:waypoint x="790" y="160" />
+        <di:waypoint x="915" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa6_di" bpmnElement="fa6">
+        <di:waypoint x="1045" y="160" />
+        <di:waypoint x="1395" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa7_di" bpmnElement="fa7">
+        <di:waypoint x="1525" y="160" />
+        <di:waypoint x="1672" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_Worker_di" bpmnElement="Pool_Worker" isHorizontal="true">
+        <dc:Bounds x="160" y="360" width="1700" height="480" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_W_di" bpmnElement="SE_W">
+        <dc:Bounds x="210" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Init_di" bpmnElement="T_W_Init">
+        <dc:Bounds x="280" y="460" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Loop_di" bpmnElement="T_W_Loop">
+        <dc:Bounds x="410" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Key_di" bpmnElement="GW_Key" isMarkerVisible="true">
+        <dc:Bounds x="535" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="519" y="443" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_WL_di" bpmnElement="T_W_WL">
+        <dc:Bounds x="620" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_WL_di" bpmnElement="GW_WL" isMarkerVisible="true">
+        <dc:Bounds x="745" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="740" y="443" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Voted_di" bpmnElement="T_W_Voted">
+        <dc:Bounds x="830" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Voted_di" bpmnElement="GW_Voted" isMarkerVisible="true">
+        <dc:Bounds x="955" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="943" y="443" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Balance_di" bpmnElement="T_W_Balance">
+        <dc:Bounds x="1040" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Bal_di" bpmnElement="GW_Bal" isMarkerVisible="true">
+        <dc:Bounds x="1165" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1174" y="443" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Vote_di" bpmnElement="T_W_Vote">
+        <dc:Bounds x="1250" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_TX_di" bpmnElement="GW_TX" isMarkerVisible="true">
+        <dc:Bounds x="1375" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1428" y="493" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Fail_di" bpmnElement="T_W_Fail">
+        <dc:Bounds x="1360" y="580" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_SkipBal_di" bpmnElement="T_W_SkipBal">
+        <dc:Bounds x="1150" y="610" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_SkipVoted_di" bpmnElement="T_W_SkipVoted">
+        <dc:Bounds x="940" y="640" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_Summary_di" bpmnElement="T_W_Summary">
+        <dc:Bounds x="1520" y="460" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_SkipWL_di" bpmnElement="T_W_SkipWL">
+        <dc:Bounds x="730" y="680" width="100" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_SkipKey_di" bpmnElement="T_W_SkipKey">
+        <dc:Bounds x="520" y="750" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_W_OK_di" bpmnElement="T_W_OK">
+        <dc:Bounds x="1360" y="370" width="100" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_W_di" bpmnElement="EE_W">
+        <dc:Bounds x="1752" y="482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1731" y="518" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fw1_di" bpmnElement="fw1">
+        <di:waypoint x="246" y="500" />
+        <di:waypoint x="280" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw2_di" bpmnElement="fw2">
+        <di:waypoint x="390" y="500" />
+        <di:waypoint x="410" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw3_di" bpmnElement="fw3">
+        <di:waypoint x="510" y="500" />
+        <di:waypoint x="535" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw4_di" bpmnElement="fw4">
+        <di:waypoint x="560" y="525" />
+        <di:waypoint x="560" y="750" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="568" y="620" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw5_di" bpmnElement="fw5">
+        <di:waypoint x="585" y="500" />
+        <di:waypoint x="620" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw6_di" bpmnElement="fw6">
+        <di:waypoint x="720" y="500" />
+        <di:waypoint x="745" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw7_di" bpmnElement="fw7">
+        <di:waypoint x="770" y="525" />
+        <di:waypoint x="770" y="680" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="778" y="588" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw8_di" bpmnElement="fw8">
+        <di:waypoint x="795" y="500" />
+        <di:waypoint x="830" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw9_di" bpmnElement="fw9">
+        <di:waypoint x="930" y="500" />
+        <di:waypoint x="955" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw10_di" bpmnElement="fw10">
+        <di:waypoint x="980" y="525" />
+        <di:waypoint x="980" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="986" y="570" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw11_di" bpmnElement="fw11">
+        <di:waypoint x="1005" y="500" />
+        <di:waypoint x="1040" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw12_di" bpmnElement="fw12">
+        <di:waypoint x="1140" y="500" />
+        <di:waypoint x="1165" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw13_di" bpmnElement="fw13">
+        <di:waypoint x="1190" y="525" />
+        <di:waypoint x="1190" y="610" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1198" y="557" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw14_di" bpmnElement="fw14">
+        <di:waypoint x="1215" y="500" />
+        <di:waypoint x="1250" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw15_di" bpmnElement="fw15">
+        <di:waypoint x="1350" y="500" />
+        <di:waypoint x="1375" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw16_di" bpmnElement="fw16">
+        <di:waypoint x="1400" y="475" />
+        <di:waypoint x="1400" y="430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1407" y="459" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw17_di" bpmnElement="fw17">
+        <di:waypoint x="1400" y="525" />
+        <di:waypoint x="1400" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1403" y="533" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw18_di" bpmnElement="fw18">
+        <di:waypoint x="1460" y="400" />
+        <di:waypoint x="1490" y="400" />
+        <di:waypoint x="1490" y="480" />
+        <di:waypoint x="1520" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw19_di" bpmnElement="fw19">
+        <di:waypoint x="1470" y="590" />
+        <di:waypoint x="1470" y="520" />
+        <di:waypoint x="1520" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw20_di" bpmnElement="fw20">
+        <di:waypoint x="610" y="810" />
+        <di:waypoint x="1510" y="810" />
+        <di:waypoint x="1510" y="540" />
+        <di:waypoint x="1530" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw21_di" bpmnElement="fw21">
+        <di:waypoint x="820" y="740" />
+        <di:waypoint x="1510" y="740" />
+        <di:waypoint x="1510" y="532" />
+        <di:waypoint x="1521" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw22_di" bpmnElement="fw22">
+        <di:waypoint x="1030" y="700" />
+        <di:waypoint x="1510" y="700" />
+        <di:waypoint x="1510" y="528" />
+        <di:waypoint x="1520" y="528" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw23_di" bpmnElement="fw23">
+        <di:waypoint x="1240" y="670" />
+        <di:waypoint x="1510" y="670" />
+        <di:waypoint x="1510" y="521" />
+        <di:waypoint x="1520" y="521" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fw24_di" bpmnElement="fw24">
+        <di:waypoint x="1640" y="500" />
+        <di:waypoint x="1752" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_start_di" bpmnElement="MF_start">
+        <di:waypoint x="980" y="200" />
+        <di:waypoint x="980" y="330" />
+        <di:waypoint x="335" y="330" />
+        <di:waypoint x="335" y="460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="907" y="296" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_result_di" bpmnElement="MF_result">
+        <di:waypoint x="1580" y="460" />
+        <di:waypoint x="1580" y="330" />
+        <di:waypoint x="1500" y="330" />
+        <di:waypoint x="1500" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1515" y="303" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

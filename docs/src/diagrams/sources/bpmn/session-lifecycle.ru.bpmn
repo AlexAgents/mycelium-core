@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_session" targetNamespace="http://mycelium.core/bpmn/session" exporter="Camunda Modeler" exporterVersion="5.46.1">
+  <bpmn:collaboration id="Collab_session">
+    <bpmn:participant id="Pool_Admin" name="Администратор" processRef="Proc_Admin" />
+    <bpmn:participant id="Pool_System" name="System / Session Manager" processRef="Proc_System" />
+    <bpmn:messageFlow id="MF_cmd" name="New Session command" sourceRef="T_A_Click" targetRef="T_S_Archive" />
+    <bpmn:messageFlow id="Flow_18rkfex" name="UI reset confirmation" sourceRef="T_S_Reset" targetRef="EE_A">
+      <bpmn:extensionElements />
+    </bpmn:messageFlow>
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Admin" isExecutable="false">
+    <bpmn:userTask id="T_A_Click" name="Нажать New Session" />
+    <bpmn:exclusiveGateway id="GW_A" name="Выбор режима" />
+    <bpmn:sequenceFlow id="fa1" sourceRef="SE_A" targetRef="T_A_Click" />
+    <bpmn:sequenceFlow id="fa2" sourceRef="T_A_Click" targetRef="GW_A" />
+    <bpmn:sequenceFlow id="fa3" name="Fast" sourceRef="GW_A" targetRef="T_A_Fast" />
+    <bpmn:sequenceFlow id="fa4" name="Clean" sourceRef="GW_A" targetRef="T_A_Clean" />
+    <bpmn:sequenceFlow id="fa5" sourceRef="T_A_Fast" targetRef="EE_A" />
+    <bpmn:sequenceFlow id="fa6" sourceRef="T_A_Clean" targetRef="EE_A" />
+    <bpmn:userTask id="T_A_Clean" name="Чистый режим&#10;(подтвердить сброс)" />
+    <bpmn:endEvent id="EE_A" name="Новая сессия готова" />
+    <bpmn:userTask id="T_A_Fast" name="Быстрый режим&#10;(оставить Geth)" />
+    <bpmn:startEvent id="SE_A" name="Решение о сбросе" />
+  </bpmn:process>
+  <bpmn:process id="Proc_System" isExecutable="false">
+    <bpmn:startEvent id="SE_S" name="Команда получена" />
+    <bpmn:serviceTask id="T_S_Archive" name="Архивация логов&#10;в logs/archive/" />
+    <bpmn:serviceTask id="T_S_Stop" name="Остановка Geth&#10;(taskkill)" />
+    <bpmn:serviceTask id="T_S_Delete" name="Удаление&#10;chain-data/active/" />
+    <bpmn:serviceTask id="T_S_Restart" name="Перезапуск Geth&#10;Ожидание RPC" />
+    <bpmn:serviceTask id="T_S_CleanUUID" name="Новый UUID&#10;(чистый режим)" />
+    <bpmn:serviceTask id="T_S_Reset" name="Сброс контекста&#10;MainWindow" />
+    <bpmn:sequenceFlow id="fs1" sourceRef="SE_S" targetRef="T_S_Archive" />
+    <bpmn:sequenceFlow id="fs2" sourceRef="T_S_Archive" targetRef="GW_S" />
+    <bpmn:sequenceFlow id="fs3" name="Fast" sourceRef="GW_S" targetRef="T_S_FastUUID" />
+    <bpmn:sequenceFlow id="fs4" name="Clean" sourceRef="GW_S" targetRef="T_S_Stop" />
+    <bpmn:sequenceFlow id="fs5" sourceRef="T_S_Stop" targetRef="T_S_Delete" />
+    <bpmn:sequenceFlow id="fs6" sourceRef="T_S_Delete" targetRef="T_S_Restart" />
+    <bpmn:sequenceFlow id="fs7" sourceRef="T_S_Restart" targetRef="T_S_CleanUUID" />
+    <bpmn:sequenceFlow id="fs8" sourceRef="T_S_FastUUID" targetRef="T_S_Reset" />
+    <bpmn:sequenceFlow id="fs9" sourceRef="T_S_CleanUUID" targetRef="T_S_Reset" />
+    <bpmn:sequenceFlow id="fs10" sourceRef="T_S_Reset" targetRef="EE_S" />
+    <bpmn:endEvent id="EE_S" name="Сессия инициализирована" />
+    <bpmn:serviceTask id="T_S_FastUUID" name="Новый UUID&#10;(быстрый режим)" />
+    <bpmn:exclusiveGateway id="GW_S" name="Режим?" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_session">
+    <bpmndi:BPMNPlane id="Plane_session" bpmnElement="Collab_session">
+      <bpmndi:BPMNShape id="Pool_Admin_di" bpmnElement="Pool_Admin" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1200" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Click_di" bpmnElement="T_A_Click">
+        <dc:Bounds x="290" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_A_di" bpmnElement="GW_A" isMarkerVisible="true">
+        <dc:Bounds x="455" y="145" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="445.5" y="121" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Clean_di" bpmnElement="T_A_Clean">
+        <dc:Bounds x="570" y="190" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_A_di" bpmnElement="EE_A">
+        <dc:Bounds x="952" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="938" y="114.5" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Fast_di" bpmnElement="T_A_Fast">
+        <dc:Bounds x="570" y="90" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_A_di" bpmnElement="SE_A">
+        <dc:Bounds x="222" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="199" y="203" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fa1_di" bpmnElement="fa1">
+        <di:waypoint x="258" y="170" />
+        <di:waypoint x="290" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa2_di" bpmnElement="fa2">
+        <di:waypoint x="410" y="170" />
+        <di:waypoint x="455" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa3_di" bpmnElement="fa3">
+        <di:waypoint x="505" y="170" />
+        <di:waypoint x="528" y="170" />
+        <di:waypoint x="528" y="130" />
+        <di:waypoint x="570" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="539" y="143" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa4_di" bpmnElement="fa4">
+        <di:waypoint x="480" y="195" />
+        <di:waypoint x="480" y="230" />
+        <di:waypoint x="570" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="203" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa5_di" bpmnElement="fa5">
+        <di:waypoint x="710" y="130" />
+        <di:waypoint x="800" y="130" />
+        <di:waypoint x="800" y="160" />
+        <di:waypoint x="955" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa6_di" bpmnElement="fa6">
+        <di:waypoint x="710" y="230" />
+        <di:waypoint x="731" y="230" />
+        <di:waypoint x="731" y="180" />
+        <di:waypoint x="955" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_System_di" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="1200" height="260" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_S_di" bpmnElement="SE_S">
+        <dc:Bounds x="210" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Archive_di" bpmnElement="T_S_Archive">
+        <dc:Bounds x="290" y="460" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Stop_di" bpmnElement="T_S_Stop">
+        <dc:Bounds x="560" y="540" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Delete_di" bpmnElement="T_S_Delete">
+        <dc:Bounds x="710" y="540" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Restart_di" bpmnElement="T_S_Restart">
+        <dc:Bounds x="860" y="540" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_CleanUUID_di" bpmnElement="T_S_CleanUUID">
+        <dc:Bounds x="1010" y="540" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Reset_di" bpmnElement="T_S_Reset">
+        <dc:Bounds x="1010" y="430" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_S_di" bpmnElement="GW_S" isMarkerVisible="true">
+        <dc:Bounds x="465" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="473" y="451" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_S_di" bpmnElement="EE_S">
+        <dc:Bounds x="1222" y="440" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1196" y="493" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_FastUUID_di" bpmnElement="T_S_FastUUID">
+        <dc:Bounds x="705" y="430" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fs1_di" bpmnElement="fs1">
+        <di:waypoint x="246" y="500" />
+        <di:waypoint x="290" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs2_di" bpmnElement="fs2">
+        <di:waypoint x="410" y="500" />
+        <di:waypoint x="465" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs3_di" bpmnElement="fs3">
+        <di:waypoint x="515" y="500" />
+        <di:waypoint x="610" y="500" />
+        <di:waypoint x="610" y="470" />
+        <di:waypoint x="705" y="470" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="614" y="451" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs4_di" bpmnElement="fs4">
+        <di:waypoint x="490" y="525" />
+        <di:waypoint x="490" y="580" />
+        <di:waypoint x="560" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="553" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs5_di" bpmnElement="fs5">
+        <di:waypoint x="680" y="580" />
+        <di:waypoint x="710" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs6_di" bpmnElement="fs6">
+        <di:waypoint x="830" y="580" />
+        <di:waypoint x="860" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs7_di" bpmnElement="fs7">
+        <di:waypoint x="980" y="580" />
+        <di:waypoint x="1010" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs8_di" bpmnElement="fs8">
+        <di:waypoint x="835" y="476" />
+        <di:waypoint x="1010" y="476" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs9_di" bpmnElement="fs9">
+        <di:waypoint x="1075" y="540" />
+        <di:waypoint x="1075" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs10_di" bpmnElement="fs10">
+        <di:waypoint x="1140" y="461" />
+        <di:waypoint x="1222" y="461" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_cmd_di" bpmnElement="MF_cmd">
+        <di:waypoint x="350" y="210" />
+        <di:waypoint x="350" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18rkfex_di" bpmnElement="Flow_18rkfex">
+        <di:waypoint x="1075" y="430" />
+        <di:waypoint x="1075" y="309" />
+        <di:waypoint x="970" y="309" />
+        <di:waypoint x="970" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="993" y="325" width="60" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

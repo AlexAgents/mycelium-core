@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_setup" targetNamespace="http://mycelium.core/bpmn/setup" exporter="Camunda Modeler" exporterVersion="5.46.1">
+  <bpmn:collaboration id="Collab_setup">
+    <bpmn:participant id="Pool_Admin" name="Administrator" processRef="Proc_Admin" />
+    <bpmn:participant id="Pool_System" name="System / Blockchain" processRef="Proc_System" />
+    <bpmn:messageFlow id="MF1" name="Deploy command" sourceRef="T_A_Deploy" targetRef="T_S_Deploy" />
+    <bpmn:messageFlow id="MF2" name="Register command" sourceRef="T_A_Register" targetRef="T_S_Register" />
+    <bpmn:messageFlow id="MF3" name="Whitelist command" sourceRef="T_A_Whitelist" targetRef="T_S_Whitelist" />
+    <bpmn:messageFlow id="MF4" name="Start command" sourceRef="T_A_Start" targetRef="T_S_Start" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Admin" isExecutable="false">
+    <bpmn:startEvent id="SE_A" name="New election decided" />
+    <bpmn:userTask id="T_A_Key" name="Enter admin private key" />
+    <bpmn:userTask id="T_A_FundDev" name="Fund from Dev (100 ETH)" />
+    <bpmn:userTask id="T_A_Deploy" name="Deploy VotingCore" />
+    <bpmn:userTask id="T_A_AddCand" name="Add candidates (Name, Party, Address)" />
+    <bpmn:userTask id="T_A_Register" name="Register On-Chain (≥2 required)" />
+    <bpmn:userTask id="T_A_GenVoters" name="Generate / import voters" />
+    <bpmn:userTask id="T_A_FundVoters" name="Fund voters with ETH" />
+    <bpmn:userTask id="T_A_Whitelist" name="Add Voters To Whitelist" />
+    <bpmn:userTask id="T_A_Start" name="Start Voting" />
+    <bpmn:endEvent id="EE_A" name="Stage = ACTIVE" />
+    <bpmn:sequenceFlow id="fa1" sourceRef="SE_A" targetRef="T_A_Key" />
+    <bpmn:sequenceFlow id="fa2" sourceRef="T_A_Key" targetRef="T_A_FundDev" />
+    <bpmn:sequenceFlow id="fa3" sourceRef="T_A_FundDev" targetRef="T_A_Deploy" />
+    <bpmn:sequenceFlow id="fa4" sourceRef="T_A_Deploy" targetRef="T_A_AddCand" />
+    <bpmn:sequenceFlow id="fa5" sourceRef="T_A_AddCand" targetRef="T_A_Register" />
+    <bpmn:sequenceFlow id="fa6" sourceRef="T_A_Register" targetRef="T_A_GenVoters" />
+    <bpmn:sequenceFlow id="fa7" sourceRef="T_A_GenVoters" targetRef="T_A_FundVoters" />
+    <bpmn:sequenceFlow id="fa8" sourceRef="T_A_FundVoters" targetRef="T_A_Whitelist" />
+    <bpmn:sequenceFlow id="fa9" sourceRef="T_A_Whitelist" targetRef="T_A_Start" />
+    <bpmn:sequenceFlow id="fa10" sourceRef="T_A_Start" targetRef="EE_A" />
+  </bpmn:process>
+  <bpmn:process id="Proc_System" isExecutable="false">
+    <bpmn:startEvent id="SE_S" name="Geth ready" />
+    <bpmn:serviceTask id="T_S_Deploy" name="Compile VotingCore.sol&#10;Deploy to chain" />
+    <bpmn:serviceTask id="T_S_Register" name="Execute addCandidate()&#10;per candidate">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property />
+        </camunda:properties>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_S_Whitelist" name="Execute&#10;addVotersBatch()" />
+    <bpmn:serviceTask id="T_S_Start" name="Execute startVoting()&#10;Emit VotingStarted" />
+    <bpmn:endEvent id="EE_S" name="Voting active" />
+    <bpmn:sequenceFlow id="fs1" sourceRef="SE_S" targetRef="T_S_Deploy" />
+    <bpmn:sequenceFlow id="fs2" sourceRef="T_S_Deploy" targetRef="T_S_Register" />
+    <bpmn:sequenceFlow id="fs3" sourceRef="T_S_Register" targetRef="T_S_Whitelist" />
+    <bpmn:sequenceFlow id="fs4" sourceRef="T_S_Whitelist" targetRef="T_S_Start" />
+    <bpmn:sequenceFlow id="fs5" sourceRef="T_S_Start" targetRef="EE_S" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_setup">
+    <bpmndi:BPMNPlane id="Plane_setup" bpmnElement="Collab_setup">
+      <bpmndi:BPMNShape id="Pool_Admin_di" bpmnElement="Pool_Admin" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1560" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_A_di" bpmnElement="SE_A">
+        <dc:Bounds x="210" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Key_di" bpmnElement="T_A_Key">
+        <dc:Bounds x="280" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_FundDev_di" bpmnElement="T_A_FundDev">
+        <dc:Bounds x="420" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Deploy_di" bpmnElement="T_A_Deploy">
+        <dc:Bounds x="560" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_AddCand_di" bpmnElement="T_A_AddCand">
+        <dc:Bounds x="700" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Register_di" bpmnElement="T_A_Register">
+        <dc:Bounds x="840" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_GenVoters_di" bpmnElement="T_A_GenVoters">
+        <dc:Bounds x="980" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_FundVoters_di" bpmnElement="T_A_FundVoters">
+        <dc:Bounds x="1120" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Whitelist_di" bpmnElement="T_A_Whitelist">
+        <dc:Bounds x="1260" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_A_Start_di" bpmnElement="T_A_Start">
+        <dc:Bounds x="1400" y="120" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_A_di" bpmnElement="EE_A">
+        <dc:Bounds x="1552" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1530" y="193" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fa1_di" bpmnElement="fa1">
+        <di:waypoint x="246" y="160" />
+        <di:waypoint x="280" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa2_di" bpmnElement="fa2">
+        <di:waypoint x="400" y="160" />
+        <di:waypoint x="420" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa3_di" bpmnElement="fa3">
+        <di:waypoint x="540" y="160" />
+        <di:waypoint x="560" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa4_di" bpmnElement="fa4">
+        <di:waypoint x="680" y="160" />
+        <di:waypoint x="700" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa5_di" bpmnElement="fa5">
+        <di:waypoint x="820" y="160" />
+        <di:waypoint x="840" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa6_di" bpmnElement="fa6">
+        <di:waypoint x="960" y="160" />
+        <di:waypoint x="980" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa7_di" bpmnElement="fa7">
+        <di:waypoint x="1100" y="160" />
+        <di:waypoint x="1120" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa8_di" bpmnElement="fa8">
+        <di:waypoint x="1240" y="160" />
+        <di:waypoint x="1260" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa9_di" bpmnElement="fa9">
+        <di:waypoint x="1380" y="160" />
+        <di:waypoint x="1400" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fa10_di" bpmnElement="fa10">
+        <di:waypoint x="1520" y="160" />
+        <di:waypoint x="1552" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_System_di" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="1560" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_S_di" bpmnElement="SE_S">
+        <dc:Bounds x="210" y="462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="201" y="498" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Deploy_di" bpmnElement="T_S_Deploy">
+        <dc:Bounds x="560" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Register_di" bpmnElement="T_S_Register">
+        <dc:Bounds x="840" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Whitelist_di" bpmnElement="T_S_Whitelist">
+        <dc:Bounds x="1260" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Start_di" bpmnElement="T_S_Start">
+        <dc:Bounds x="1400" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_S_di" bpmnElement="EE_S">
+        <dc:Bounds x="1552" y="462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1539" y="513" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fs1_di" bpmnElement="fs1">
+        <di:waypoint x="246" y="480" />
+        <di:waypoint x="560" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs2_di" bpmnElement="fs2">
+        <di:waypoint x="680" y="480" />
+        <di:waypoint x="840" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs3_di" bpmnElement="fs3">
+        <di:waypoint x="960" y="480" />
+        <di:waypoint x="1260" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs4_di" bpmnElement="fs4">
+        <di:waypoint x="1380" y="480" />
+        <di:waypoint x="1400" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs5_di" bpmnElement="fs5">
+        <di:waypoint x="1520" y="480" />
+        <di:waypoint x="1552" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF1_di" bpmnElement="MF1">
+        <di:waypoint x="620" y="200" />
+        <di:waypoint x="620" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="627" y="310" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF2_di" bpmnElement="MF2">
+        <di:waypoint x="900" y="200" />
+        <di:waypoint x="900" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="915" y="303" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF3_di" bpmnElement="MF3">
+        <di:waypoint x="1320" y="200" />
+        <di:waypoint x="1320" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1335" y="303" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF4_di" bpmnElement="MF4">
+        <di:waypoint x="1460" y="200" />
+        <di:waypoint x="1460" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1492" y="310" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,43 @@
+# ==========================================
+# MYCELIUM CORE
+# ==========================================
+
+# Environment Variables
+.env
+!.env.example
+app.cfg
+
+# Runtime Data & Logs
+data/
+runtime/
+*.log
+
+# Build Artifacts
+contracts/abi/
+build/
+dist/
+checksums.txt
+*.spec
+bin/geth*
+bin/solc*
+!bin/.gitkeep
+
+# Python Caches & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+venv/
+env/
+.venv/
+
+# OS & IDE Specific
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

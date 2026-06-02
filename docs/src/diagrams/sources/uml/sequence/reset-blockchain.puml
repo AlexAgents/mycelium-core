@@ -1,0 +1,56 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Sequence Diagram - Reset Blockchain (Clean Mode)
+
+actor "Administrator" as Admin
+participant "MainWindow" as MW
+participant "ResetBlockchainWorker" as Worker
+participant "AppController" as AC
+participant "GethManager" as GM
+participant "Web3Provider" as WP
+
+Admin -> MW : click "Reset Blockchain"
+activate MW
+MW -> MW : show ResetChainDialog()
+note over MW : Confirms deletion\nof chain-data
+
+MW -> Worker : create(delete_logs=True)
+MW -> Worker : start()
+activate Worker
+
+Worker -> AC : reset_blockchain_data()
+activate AC
+AC -> GM : stop()
+activate GM
+note over GM : Stops Geth gracefully\nand runs taskkill
+GM --> AC : stopped
+deactivate GM
+
+note over AC : Wait 2 seconds for\nWindows file lock release
+
+AC -> AC : delete directories\n(chain-data/active, logs/archive)
+note over AC : Uses rmtree_with_retry\nto prevent WinError 32
+
+AC -> GM : start()
+activate GM
+GM --> AC : started
+deactivate GM
+
+AC -> WP : connect()
+activate WP
+WP --> AC : connected
+deactivate WP
+
+AC -> AC : new_session()
+AC --> Worker : success
+deactivate AC
+
+Worker --> MW : finished.emit(True)
+deactivate Worker
+MW -> MW : reset_ui_all_tabs()
+MW -> MW : show Toast("Blockchain Reset Successful")
+MW --> Admin : renders initial setup stage
+deactivate MW
+
+@enduml

@@ -1,0 +1,113 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Class Diagram (Models & DTOs) - MYCELIUM CORE
+
+enum ElectionStage {
+    SETUP
+    ACTIVE
+    FINISHED
+}
+
+class Candidate {
+    + name: str
+    + party: str
+    + address: str
+    + registered: bool
+    + vote_count: int
+}
+
+class Voter {
+    + address: str
+    + private_key: Optional[str]
+    + to_export_dict() -> dict
+}
+
+class VoteReceipt {
+    + tx_hash: str
+    + block_number: int
+    + voter_address: str
+    + candidate_address: str
+    + qr_bytes: Optional[bytes]
+    + to_dict() -> dict
+}
+
+class AuditCheck {
+    + check_name: str
+    + status: str
+    + details: str
+}
+
+class AuditReport {
+    + session_id: str
+    + audit_timestamp: datetime
+    + checks: List[AuditCheck]
+    + passed_count: int
+    + failed_count: int
+}
+
+class SessionContext {
+    + session_id: Optional[str]
+    + contract_address: Optional[str]
+    + deploy_block: int
+    + voters: List[Voter]
+    + candidates: List[Candidate]
+}
+
+enum PrecheckStatus {
+    OK
+    INVALID_KEY
+    NOT_WHITELISTED
+    ALREADY_VOTED
+    INSUFFICIENT_BALANCE
+    NO_CONTRACT
+    UNKNOWN_ERROR
+}
+
+class PrecheckResult {
+    + status: PrecheckStatus
+    + address: str
+    + balance_wei: int
+    + required_wei: int
+    + error_text: str
+    + is_ok(): bool
+}
+
+class ParsedError {
+    + message_key: Optional[str]
+    + raw_message: str
+    + action_key: Optional[str]
+    + action_id: Optional[str]
+}
+
+class VoterStatus {
+    + key_valid: bool
+    + address: str
+    + is_whitelisted: Optional[bool]
+    + has_voted: Optional[bool]
+    + balance_eth: Optional[str]
+    + stage_name: Optional[str]
+    + error: Optional[str]
+}
+
+note right of ParsedError
+  Returns i18n keys instead of
+  hardcoded strings. UI calls
+  t(message_key) and t(action_key)
+  itself, keeping layer separation.
+end note
+
+note right of VoterStatus
+  Aggregated snapshot for VoteTab.
+  Built by AppController.get_voter_status()
+  to avoid 3 synchronous RPC calls
+  from the UI thread.
+end note
+
+SessionContext "1" *-- "many" Voter : aggregation
+SessionContext "1" *-- "many" Candidate : aggregation
+AuditReport "1" *-- "many" AuditCheck : composition
+
+PrecheckResult --> PrecheckStatus : uses
+
+@enduml

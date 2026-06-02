@@ -1,0 +1,37 @@
+@startuml
+!include ../_common/theme.iuml
+
+title State Diagram - Voting Smart Contract Lifecycle
+
+[*] --> Setup : Constructor deployed
+
+state Setup {
+    [*] --> StageSetup
+    StageSetup : - candidates.length: 0 to 10
+    StageSetup : - addCandidate() allowed
+    StageSetup : - addVotersBatch() allowed
+    StageSetup : - voting is locked
+}
+
+Setup --> Active : startVoting() [requires cands >= 2]
+
+state Active {
+    [*] --> StageActive
+    StageActive : - candidates list is frozen
+    StageActive : - whitelist is frozen
+    StageActive : - castVote() allowed
+    StageActive : - hasVoted set to true on vote
+}
+
+Active --> Finished : finishVoting()
+
+state Finished {
+    [*] --> StageFinished
+    StageFinished : - contract is completely frozen
+    StageFinished : - audit functions allowed
+    StageFinished : - winner is determined
+}
+
+StageFinished --> [*]
+
+@enduml

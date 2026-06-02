@@ -1,0 +1,31 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма состояний: Состояния SessionContext
+
+[*] --> НеИнициализировано
+
+state НеИнициализировано {
+  НеИнициализировано : - session_id равен None
+  НеИнициализировано : - contract_address равен None
+}
+
+НеИнициализировано --> СтадияSetup : create_session() [session_id создан]
+
+state СтадияSetup {
+  СтадияSetup : - contract_address равен None
+  СтадияSetup : - список кандидатов пуст
+  СтадияSetup : - UI: Кнопка Deploy активна
+}
+
+СтадияSetup --> КонтрактРазвернут : deploy_contract()
+
+state КонтрактРазвернут {
+  КонтрактРазвернут : - contract_address валиден
+  КонтрактРазвернут : - UI: Кнопка Deploy отключена
+}
+
+КонтрактРазвернут --> НеИнициализировано : new_session() [архивирует старую сессию]
+КонтрактРазвернут --> НеИнициализировано : reset_blockchain_data() [цепь удалена + новая сессия]
+
+@enduml

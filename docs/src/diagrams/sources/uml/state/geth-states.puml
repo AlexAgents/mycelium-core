@@ -1,0 +1,32 @@
+@startuml
+!include ../_common/theme.iuml
+
+title State Diagram - GethManager States
+
+[*] --> Stopped
+
+state Stopped {
+    Stopped : - _process is None
+    Stopped : - port 8545 is free
+}
+
+Stopped --> Starting : start() [spawns geth process]
+
+state Starting {
+    Starting : - process.poll() is None
+    Starting : - wait-for-rpc grace period (5s)
+}
+
+Starting --> Running : wait_for_rpc() success
+Starting --> Crashed : process terminates during grace
+
+state Running {
+    Running : - RPC is ready (block >= 0)
+    Running : - MonitorThread active
+}
+
+Running --> Crashed : process terminates unexpectedly
+Running --> Stopped : stop() [shutting_down = True]
+Crashed --> Stopped : stop() [user acknowledges]
+
+@enduml

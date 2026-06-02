@@ -1,0 +1,26 @@
+@startuml
+!include ../_common/theme.iuml
+
+title C4 Контекстная диаграмма (Уровень 1) - MYCELIUM CORE
+
+actor "Администратор" as ADMIN
+actor "Избиратель" as VOTER
+actor "Аудитор" as AUDITOR
+
+package "MYCELIUM CORE (System Boundary)" {
+  component "GUI Приложение" as APP
+  database "Конфиги и Логи" as FILES
+}
+
+node "Локальный узел Geth" as GETH
+node "py-solc-x (Компилятор Solidity)" as SOLC
+
+ADMIN --> APP : Управляет выборами, кандидатами, whitelist
+VOTER --> APP : Отправляет приватный ключ, голосует
+AUDITOR --> APP : Запускает аудит безопасности, экспортирует результаты
+
+APP --> GETH : Отправляет JSON-RPC вызовы / Контракт VC
+APP --> FILES : Читает конфиги / пишет логи
+APP --> SOLC : Компилирует контракт через CLI
+
+@enduml

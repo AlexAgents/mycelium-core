@@ -1,0 +1,56 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Sequence Diagram - Cast Vote Process
+
+actor "Voter" as User
+participant "VoteTab" as UI
+participant "VoteWorker" as Worker
+participant "AppController" as AC
+participant "VotingService" as VS
+participant "NonceManager" as NM
+participant "Web3Provider" as WP
+
+User -> UI : select candidate, click "Cast Vote"
+activate UI
+UI -> AC : precheck_vote(private_key)
+activate AC
+note over AC : Validates key, whitelist,\nhas_voted, balance
+AC --> UI : returns PrecheckResult (OK)
+deactivate AC
+
+UI -> Worker : create(key, candidate_addr)
+UI -> Worker : start()
+activate Worker
+UI -> UI : set_button_disabled()
+
+Worker -> AC : cast_vote()
+activate AC
+AC -> VS : cast_vote(key, candidate_addr)
+activate VS
+VS -> NM : get_next_nonce(address)
+activate NM
+NM --> VS : returns nonce
+deactivate NM
+VS -> WP : send_raw_transaction(signed_tx)
+activate WP
+WP --> VS : returns tx_hash
+deactivate WP
+VS -> WP : wait_for_receipt(tx_hash)
+activate WP
+WP --> VS : returns receipt (block_number)
+deactivate WP
+VS --> AC : returns VoteReceipt
+deactivate VS
+AC --> Worker : returns VoteReceipt
+deactivate AC
+
+Worker --> UI : finished.emit(receipt)
+deactivate Worker
+UI -> UI : generate_qr_receipt()
+UI -> UI : clear_private_key_field()
+UI -> UI : show Toast("Vote Cast!")
+UI --> User : displays TX Hash & QR Code
+deactivate UI
+
+@enduml

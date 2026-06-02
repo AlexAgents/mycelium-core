@@ -1,0 +1,57 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма последовательности: Деплой контракта VotingCore
+
+actor "Администратор" as Admin
+participant "Вкладка Admin" as UI
+participant "DeployWorker" as Worker
+participant "AppController" as AC
+participant "CompilerService" as CS
+participant "VotingService" as VS
+participant "Web3Provider" as WP
+
+Admin -> UI : нажимает "Deploy"
+activate UI
+UI -> UI : validate_private_key()
+UI -> Worker : create(admin_key)
+UI -> Worker : start()
+activate Worker
+
+Worker -> AC : compile_contract()
+activate AC
+AC -> CS : compile_contract()
+activate CS
+note over CS : Компилирует контракт\nчерез py-solc-x
+CS --> AC : возвращает (abi, bytecode)
+deactivate CS
+AC --> Worker : возвращает (abi, bytecode)
+deactivate AC
+
+Worker -> AC : deploy_contract()
+activate AC
+AC -> VS : deploy_contract(abi, bytecode)
+activate VS
+VS -> WP : send_transaction(tx_data)
+activate WP
+note over WP : Транслирует TX\nв локальный Geth
+WP --> VS : возвращает tx_hash
+deactivate WP
+VS -> WP : wait_for_receipt(tx_hash)
+activate WP
+WP --> VS : возвращает квитанцию (contract_address)
+deactivate WP
+VS --> AC : returns contract_address
+deactivate VS
+AC -> AC : update SessionContext
+AC --> Worker : returns contract_address
+deactivate AC
+
+Worker --> UI : finished.emit(contract_address)
+deactivate Worker
+UI -> UI : lock_inputs()
+UI -> UI : show Toast("Success")
+UI --> Admin : отрисовывает состояние деплоя
+deactivate UI
+
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма активности: Валидация перед голосованием (5 уровней)
+
+start
+
+:Избиратель вводит приватный ключ;
+if (Приватный ключ валиден?) then (нет)
+    :Возврат INVALID_KEY;
+    end
+else (да)
+    :Вычисление Ethereum-адреса;
+    if (Контракт развернут?) then (нет)
+        :Возврат NO_CONTRACT;
+        end
+    else (да)
+        if (Адрес в whitelist?) then (нет)
+            :Возврат NOT_WHITELISTED;
+            end
+        else (да)
+            if (Уже голосовал?) then (да)
+                :Возврат ALREADY_VOTED;
+                end
+            else (нет)
+                if (Баланс >= 0.0003 ETH?) then (нет)
+                    :Возврат INSUFFICIENT_BALANCE;
+                    end
+                else (да)
+                    :Возврат OK;
+                    stop
+                endif
+            endif
+        endif
+    endif
+endif
+
+@enduml

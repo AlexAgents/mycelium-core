@@ -1,0 +1,46 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма развертывания (UML) - MYCELIUM CORE
+
+node "ОС разработчика (Windows 10/11)" {
+  package "Среда выполнения Python (v3.11+)" {
+    artifact "Исполняемый файл MYCELIUM CORE" as EXE <<file>>
+    component "Цикл событий PyQt6" as QT <<subsystem>>
+    component "Клиент Web3.py" as W3 <<library>>
+
+    EXE ..> QT : использует
+    EXE ..> W3 : использует
+  }
+
+  node "Локальная файловая система" {
+    folder "data/" {
+      file "app.cfg" as FILE_CFG
+      file ".env" as FILE_ENV
+      folder "chain-data/" as DATA_DIR
+      folder "logs/" as LOGS_DIR
+      folder "exports/" as EXPORTS_DIR
+      folder "runtime/" as RUNTIME_DIR
+    }
+  }
+
+  node "Процесс песочницы Geth" as GETH_NODE {
+    component "Движок Geth (go-ethereum)" as GETH_EXEC
+    port "JSON-RPC (8545)" as PORT_RPC
+    
+    GETH_EXEC - PORT_RPC
+  }
+
+  node "py-solc-x (компилятор Solidity)" as SOLC_NODE {
+    component "Бинарный файл solc" as SOLC_EXEC
+  }
+}
+
+W3 ---> PORT_RPC : TCP / HTTP Loopback
+EXE ---> FILE_CFG : читает/записывает
+EXE ---> FILE_ENV : читает
+GETH_EXEC ---> DATA_DIR : записывает блоки
+EXE ---> LOGS_DIR : дописывает/архивирует
+EXE ---> SOLC_EXEC : компилирует контракт через CLI
+
+@enduml

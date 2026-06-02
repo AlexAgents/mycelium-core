@@ -1,0 +1,39 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Activity Diagram - Geth Process Startup Flow
+
+start
+:Check if geth.exe exists;
+if (Exists?) then (no)
+  :Throw FileNotFoundError;
+  stop
+else (yes)
+  :Force kill zombie geth processes;
+  :Check if port 8545 is in use;
+  if (Port occupied?) then (yes)
+    :Force taskkill /F /IM geth.exe;
+    :Wait 2 seconds;
+    if (Port still occupied?) then (yes)
+      :Throw RuntimeError;
+      stop
+    else (no)
+    endif
+  else (no)
+  endif
+
+  :Spawn Geth Popen Process;
+  :Start MonitorThread;
+  :Poll RPC loop (timeout 30s);
+  
+  if (RPC connected?) then (yes)
+    :Set Geth state to Running;
+    :Return Success;
+    stop
+  else (no)
+    :Throw RuntimeError ("RPC unavailable");
+    stop
+  endif
+endif
+
+@enduml

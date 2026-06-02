@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_audit" targetNamespace="http://mycelium.core/bpmn/audit" exporter="Camunda Modeler" exporterVersion="5.46.1">
+  <bpmn:collaboration id="Collab_audit">
+    <bpmn:participant id="Pool_Auditor" name="Auditor" processRef="Proc_Auditor" />
+    <bpmn:participant id="Pool_System" name="System / AuditService" processRef="Proc_System" />
+    <bpmn:messageFlow id="MF_run" name="Run Audit request" sourceRef="T_Au_Run" targetRef="T_S_Query" />
+    <bpmn:messageFlow id="MF_res" name="Check results" sourceRef="T_S_Format" targetRef="T_Au_Review" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Auditor" isExecutable="false">
+    <bpmn:startEvent id="SE_Au" name="Auditor opens Audit tab" />
+    <bpmn:userTask id="T_Au_Mode" name="Select audit mode&#10;(Full / Pre / Live / Final)" />
+    <bpmn:userTask id="T_Au_Run" name="Click Run Audit" />
+    <bpmn:userTask id="T_Au_Review" name="Review SEC-check&#10;results table" />
+    <bpmn:userTask id="T_Au_Copy" name="Copy Report" />
+    <bpmn:userTask id="T_Au_JSON" name="Export JSON" />
+    <bpmn:userTask id="T_Au_CSV" name="Export CSV" />
+    <bpmn:sequenceFlow id="fau1" sourceRef="SE_Au" targetRef="T_Au_Mode" />
+    <bpmn:sequenceFlow id="fau2" sourceRef="T_Au_Mode" targetRef="T_Au_Run" />
+    <bpmn:sequenceFlow id="fau3" sourceRef="T_Au_Run" targetRef="T_Au_Review" />
+    <bpmn:sequenceFlow id="fau4" sourceRef="T_Au_Review" targetRef="GW_Au" />
+    <bpmn:sequenceFlow id="fau5" name="Yes" sourceRef="GW_Au" targetRef="T_Au_Copy" />
+    <bpmn:sequenceFlow id="fau6" name="No" sourceRef="GW_Au" targetRef="T_Au_Invest" />
+    <bpmn:sequenceFlow id="fau7" sourceRef="T_Au_Copy" targetRef="T_Au_JSON" />
+    <bpmn:sequenceFlow id="fau8" sourceRef="T_Au_JSON" targetRef="T_Au_CSV" />
+    <bpmn:sequenceFlow id="fau9" sourceRef="T_Au_CSV" targetRef="EE_Au" />
+    <bpmn:sequenceFlow id="fau10" sourceRef="T_Au_Invest" targetRef="EE_Au" />
+    <bpmn:userTask id="T_Au_Invest" name="Investigate failed&#10;checks &#38; logs" />
+    <bpmn:endEvent id="EE_Au" name="Report archived" />
+    <bpmn:exclusiveGateway id="GW_Au" name="All passed?" />
+  </bpmn:process>
+  <bpmn:process id="Proc_System" isExecutable="false">
+    <bpmn:sequenceFlow id="fs1" sourceRef="SE_S" targetRef="T_S_Query" />
+    <bpmn:startEvent id="SE_S" name="Request received" />
+    <bpmn:serviceTask id="T_S_Query" name="Query VoteCast,&#10;StageChanged events" />
+    <bpmn:serviceTask id="T_S_SEC01" name="SEC-01&#10;Double Vote" />
+    <bpmn:serviceTask id="T_S_SEC02" name="SEC-02&#10;Whitelist" />
+    <bpmn:serviceTask id="T_S_SEC03" name="SEC-03&#10;Stage" />
+    <bpmn:serviceTask id="T_S_SEC04" name="SEC-04&#10;Candidates" />
+    <bpmn:serviceTask id="T_S_SEC05" name="SEC-05&#10;Owner" />
+    <bpmn:serviceTask id="T_S_SEC06" name="SEC-06&#10;Integrity" />
+    <bpmn:serviceTask id="T_S_Compile" name="Compile&#10;AuditReport" />
+    <bpmn:serviceTask id="T_S_Format" name="Format&#10;JSON / CSV" />
+    <bpmn:endEvent id="EE_S" name="Results returned" />
+    <bpmn:sequenceFlow id="fs2" sourceRef="T_S_Query" targetRef="T_S_SEC01" />
+    <bpmn:sequenceFlow id="fs3" sourceRef="T_S_SEC01" targetRef="T_S_SEC02" />
+    <bpmn:sequenceFlow id="fs4" sourceRef="T_S_SEC02" targetRef="T_S_SEC03" />
+    <bpmn:sequenceFlow id="fs5" sourceRef="T_S_SEC03" targetRef="T_S_SEC04" />
+    <bpmn:sequenceFlow id="fs6" sourceRef="T_S_SEC04" targetRef="T_S_SEC05" />
+    <bpmn:sequenceFlow id="fs7" sourceRef="T_S_SEC05" targetRef="T_S_SEC06" />
+    <bpmn:sequenceFlow id="fs8" sourceRef="T_S_SEC06" targetRef="T_S_Compile" />
+    <bpmn:sequenceFlow id="fs9" sourceRef="T_S_Compile" targetRef="T_S_Format" />
+    <bpmn:sequenceFlow id="fs10" sourceRef="T_S_Format" targetRef="EE_S" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_audit">
+    <bpmndi:BPMNPlane id="Plane_audit" bpmnElement="Collab_audit">
+      <bpmndi:BPMNShape id="Pool_Auditor_di" bpmnElement="Pool_Auditor" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1400" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_Au_di" bpmnElement="SE_Au">
+        <dc:Bounds x="210" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_Mode_di" bpmnElement="T_Au_Mode">
+        <dc:Bounds x="280" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_Run_di" bpmnElement="T_Au_Run">
+        <dc:Bounds x="430" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_Review_di" bpmnElement="T_Au_Review">
+        <dc:Bounds x="580" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_Au_di" bpmnElement="GW_Au" isMarkerVisible="true">
+        <dc:Bounds x="735" y="145" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="701" y="203" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_Copy_di" bpmnElement="T_Au_Copy">
+        <dc:Bounds x="820" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_JSON_di" bpmnElement="T_Au_JSON">
+        <dc:Bounds x="950" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_CSV_di" bpmnElement="T_Au_CSV">
+        <dc:Bounds x="1080" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Au_Invest_di" bpmnElement="T_Au_Invest">
+        <dc:Bounds x="810" y="190" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_Au_di" bpmnElement="EE_Au">
+        <dc:Bounds x="1322" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1301" y="98" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fau1_di" bpmnElement="fau1">
+        <di:waypoint x="246" y="170" />
+        <di:waypoint x="280" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau2_di" bpmnElement="fau2">
+        <di:waypoint x="400" y="170" />
+        <di:waypoint x="430" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau3_di" bpmnElement="fau3">
+        <di:waypoint x="550" y="170" />
+        <di:waypoint x="580" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau4_di" bpmnElement="fau4">
+        <di:waypoint x="700" y="170" />
+        <di:waypoint x="735" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau5_di" bpmnElement="fau5">
+        <di:waypoint x="760" y="145" />
+        <di:waypoint x="760" y="130" />
+        <di:waypoint x="820" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="780" y="113" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau6_di" bpmnElement="fau6">
+        <di:waypoint x="760" y="195" />
+        <di:waypoint x="760" y="230" />
+        <di:waypoint x="810" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="782" y="213" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau7_di" bpmnElement="fau7">
+        <di:waypoint x="920" y="140" />
+        <di:waypoint x="950" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau8_di" bpmnElement="fau8">
+        <di:waypoint x="1050" y="140" />
+        <di:waypoint x="1080" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau9_di" bpmnElement="fau9">
+        <di:waypoint x="1180" y="140" />
+        <di:waypoint x="1322" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fau10_di" bpmnElement="fau10">
+        <di:waypoint x="930" y="230" />
+        <di:waypoint x="1340" y="230" />
+        <di:waypoint x="1340" y="158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_System_di" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="1400" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_S_di" bpmnElement="SE_S">
+        <dc:Bounds x="210" y="462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="498" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Query_di" bpmnElement="T_S_Query">
+        <dc:Bounds x="340" y="440" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC01_di" bpmnElement="T_S_SEC01">
+        <dc:Bounds x="480" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC02_di" bpmnElement="T_S_SEC02">
+        <dc:Bounds x="600" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC03_di" bpmnElement="T_S_SEC03">
+        <dc:Bounds x="720" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC04_di" bpmnElement="T_S_SEC04">
+        <dc:Bounds x="840" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC05_di" bpmnElement="T_S_SEC05">
+        <dc:Bounds x="960" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_SEC06_di" bpmnElement="T_S_SEC06">
+        <dc:Bounds x="1080" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Compile_di" bpmnElement="T_S_Compile">
+        <dc:Bounds x="1200" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Format_di" bpmnElement="T_S_Format">
+        <dc:Bounds x="1320" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_S_di" bpmnElement="EE_S">
+        <dc:Bounds x="1482" y="462" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1460" y="513" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fs1_di" bpmnElement="fs1">
+        <di:waypoint x="246" y="480" />
+        <di:waypoint x="340" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs2_di" bpmnElement="fs2">
+        <di:waypoint x="460" y="480" />
+        <di:waypoint x="480" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs3_di" bpmnElement="fs3">
+        <di:waypoint x="580" y="480" />
+        <di:waypoint x="600" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs4_di" bpmnElement="fs4">
+        <di:waypoint x="700" y="480" />
+        <di:waypoint x="720" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs5_di" bpmnElement="fs5">
+        <di:waypoint x="820" y="480" />
+        <di:waypoint x="840" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs6_di" bpmnElement="fs6">
+        <di:waypoint x="940" y="480" />
+        <di:waypoint x="960" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs7_di" bpmnElement="fs7">
+        <di:waypoint x="1060" y="480" />
+        <di:waypoint x="1080" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs8_di" bpmnElement="fs8">
+        <di:waypoint x="1180" y="480" />
+        <di:waypoint x="1200" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs9_di" bpmnElement="fs9">
+        <di:waypoint x="1300" y="480" />
+        <di:waypoint x="1320" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs10_di" bpmnElement="fs10">
+        <di:waypoint x="1420" y="480" />
+        <di:waypoint x="1482" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_run_di" bpmnElement="MF_run">
+        <di:waypoint x="516" y="210" />
+        <di:waypoint x="516" y="325" />
+        <di:waypoint x="374" y="325" />
+        <di:waypoint x="374" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="233" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_res_di" bpmnElement="MF_res">
+        <di:waypoint x="1370" y="440" />
+        <di:waypoint x="1370" y="325" />
+        <di:waypoint x="640" y="325" />
+        <di:waypoint x="640" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1296" y="403" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,56 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма последовательности: Сброс блокчейна (Чистый режим)
+
+actor "Администратор" as Admin
+participant "Главное окно" as MW
+participant "ResetBlockchainWorker" as Worker
+participant "AppController" as AC
+participant "GethManager" as GM
+participant "Web3Provider" as WP
+
+Admin -> MW : нажимает "Reset Blockchain"
+activate MW
+MW -> MW : show ResetChainDialog()
+note over MW : Подтверждает удаление\nchain-data
+
+MW -> Worker : create(delete_logs=True)
+MW -> Worker : start()
+activate Worker
+
+Worker -> AC : reset_blockchain_data()
+activate AC
+AC -> GM : stop()
+activate GM
+note over GM : Останавливает Geth корректно\nи запускает taskkill
+GM --> AC : остановлен
+deactivate GM
+
+note over AC : Ожидание 2 секунды для\nосвобождения файлов Windows
+
+AC -> AC : удаляет директории\n(chain-data/active, logs/archive)
+note over AC : Использует rmtree_with_retry\nдля предотвращения WinError 32
+
+AC -> GM : start()
+activate GM
+GM --> AC : запущен
+deactivate GM
+
+AC -> WP : connect()
+activate WP
+WP --> AC : подключен
+deactivate WP
+
+AC -> AC : new_session()
+AC --> Worker : успех
+deactivate AC
+
+Worker --> MW : finished.emit(True)
+deactivate Worker
+MW -> MW : reset_ui_all_tabs()
+MW -> MW : show Toast("Blockchain Reset Successful")
+MW --> Admin : отрисовывает начальную стадию Setup
+deactivate MW
+
+@enduml

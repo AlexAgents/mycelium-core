@@ -1,0 +1,121 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма компонентов (UML) - MYCELIUM CORE
+
+package "Слой представления (UI)" {
+  [MainWindow] as MW
+  [AdminTab] as AT
+  [VoteTab] as VT
+  [AuditTab] as AudT
+  [LogsTab] as LT
+
+  MW --> AT : содержит
+  MW --> VT : содержит
+  MW --> AudT : содержит
+  MW --> LT : содержит
+}
+
+package "UI-воркеры (QThread)" {
+  [DeployWorker] as DW
+  [VoteWorker] as VW
+  [MassVoteWorker] as MVW
+  [VoterStatusWorker] as VSW
+  [FundVotersWorker] as FVW
+  [FundFromDevWorker] as FFDW
+  [WhitelistWorker] as WLW
+  [RegisterCandidatesWorker] as RCW
+  [StageWorker] as SW
+  [ResetBlockchainWorker] as RBW
+
+  AT ..> DW : запускает
+  AT ..> FVW : запускает
+  AT ..> FFDW : запускает
+  AT ..> WLW : запускает
+  AT ..> RCW : запускает
+  AT ..> SW : запускает
+
+  VT ..> VW : запускает
+  VT ..> MVW : запускает
+  VT ..> VSW : запускает
+
+  MW ..> RBW : запускает
+}
+
+package "Прикладной слой (Фасад)" {
+  [AppController] as AC
+
+  AT --> AC : вызывает
+  VT --> AC : вызывает
+  AudT --> AC : вызывает
+  LT --> AC : читает
+  MW --> AC : отслеживает
+
+  DW --> AC : делегирует
+  VW --> AC : делегирует
+  MVW --> AC : делегирует
+  VSW --> AC : делегирует
+  FVW --> AC : делегирует
+  FFDW --> AC : делегирует
+  WLW --> AC : делегирует
+  RCW --> AC : делегирует
+  SW --> AC : делегирует
+  RBW --> AC : делегирует
+}
+
+package "Доменный / Сервисный слой" {
+  [VotingService] as VS
+  [AuditService] as AS
+  [ErrorParser] as EP
+  [PrecheckValidator] as PV
+
+  AC --> VS : делегирует
+  AC --> AS : делегирует
+  AC --> EP : делегирует
+  AC --> PV : делегирует
+}
+
+package "Инфраструктурный слой" {
+  [Web3Provider] as WP
+  [GethManager] as GM
+  [NonceManager] as NM
+  [CompilerService] as CS
+
+  VS --> WP : RPC
+  VS --> NM : nonce-значения
+  AS --> WP : события
+  AC --> GM : управляет
+  AC --> CS : компилирует
+}
+
+database "Локальное хранилище" {
+  [app.cfg] as CFG
+  [.env] as ENV
+  [session.log] as LOG
+
+  AC --> CFG : загружает/сохраняет
+  AC --> ENV : загружает
+  AC --> LOG : архивирует
+}
+
+node "Внешний процесс" {
+  component "geth.exe (PID)" as GETH
+  component "solc.exe" as SOLC
+
+  GM --> GETH : запускает/отслеживает
+  CS --> SOLC : выполняет
+}
+
+node "Узел блокчейна" {
+  [VotingCore Contract] as VC
+  WP --> VC : вызовы Web3
+}
+
+note right of VSW
+  Добавлен в v1.0.1:
+  неблокирующий запрос статуса избирателя
+  для VoteTab (исправлено зависание UI
+  при вводе приватного ключа).
+end note
+
+@enduml

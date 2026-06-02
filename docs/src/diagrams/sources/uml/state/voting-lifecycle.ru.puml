@@ -1,0 +1,37 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма состояний: Жизненный цикл смарт-контракта
+
+[*] --> Setup : Конструктор развернут
+
+state Setup {
+    [*] --> StageSetup
+    StageSetup : - candidates.length: от 0 до 10
+    StageSetup : - addCandidate() разрешен
+    StageSetup : - addVotersBatch() разрешен
+    StageSetup : - голосование заблокировано
+}
+
+Setup --> Active : startVoting() [требуется >= 2 кандидатов]
+
+state Active {
+    [*] --> StageActive
+    StageActive : - список кандидатов заморожен
+    StageActive : - whitelist заморожен
+    StageActive : - castVote() разрешен
+    StageActive : - hasVoted становится true
+}
+
+Active --> Finished : finishVoting()
+
+state Finished {
+    [*] --> StageFinished
+    StageFinished : - контракт полностью заморожен
+    StageFinished : - функции аудита разрешены
+    StageFinished : - победитель определен
+}
+
+StageFinished --> [*]
+
+@enduml

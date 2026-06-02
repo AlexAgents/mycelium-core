@@ -1,0 +1,67 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Use Case Diagram — MYCELIUM CORE
+
+left to right direction
+
+actor "Administrator" as ADMIN
+actor "Voter" as VOTER
+actor "Auditor" as AUDITOR
+
+rectangle "MYCELIUM CORE" {
+
+  ' ── Administrator Use Cases ──
+  usecase "Deploy VotingCore Contract" as UC_DEPLOY
+  usecase "Register Candidates" as UC_CAND
+  usecase "Generate Test Voters" as UC_GEN
+  usecase "Import / Export Voters JSON" as UC_IO
+  usecase "Fund Voters with ETH" as UC_FUND
+  usecase "Add Voters to Whitelist" as UC_WL
+  usecase "Start Voting" as UC_START
+  usecase "Finish Voting" as UC_FINISH
+  usecase "Create New Session" as UC_SESSION
+  usecase "Reset Blockchain Data" as UC_RESET
+
+  ' ── Voter Use Cases ──
+  usecase "Authenticate via Private Key" as UC_AUTH
+  usecase "Cast Vote" as UC_VOTE
+  usecase "Receive QR Receipt" as UC_QR
+  usecase "Mass Vote (Testing)" as UC_MASS
+
+  ' ── Auditor Use Cases ──
+  usecase "Run Security Audit" as UC_AUDIT
+  usecase "View Election Results" as UC_RESULTS
+  usecase "Export Audit Report" as UC_EXPORT
+
+  ' ── Admin connections ──
+  ADMIN --> UC_DEPLOY
+  ADMIN --> UC_CAND
+  ADMIN --> UC_GEN
+  ADMIN --> UC_IO
+  ADMIN --> UC_FUND
+  ADMIN --> UC_WL
+  ADMIN --> UC_START
+  ADMIN --> UC_FINISH
+  ADMIN --> UC_SESSION
+  ADMIN --> UC_RESET
+
+  ' ── Voter connections ──
+  VOTER --> UC_AUTH
+  VOTER --> UC_VOTE
+  VOTER --> UC_QR
+  VOTER --> UC_MASS
+
+  ' ── Auditor connections ──
+  AUDITOR --> UC_AUDIT
+  AUDITOR --> UC_RESULTS
+  AUDITOR --> UC_EXPORT
+
+  ' ── Dependencies ──
+  UC_VOTE ..> UC_AUTH : <<include>>
+  UC_VOTE ..> UC_QR : <<include>>
+  UC_MASS ..> UC_VOTE : <<include>>
+  UC_AUDIT ..> UC_RESULTS : <<include>>
+}
+
+@enduml

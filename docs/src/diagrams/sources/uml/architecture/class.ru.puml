@@ -1,0 +1,113 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма классов (Модели и DTO) - MYCELIUM CORE
+
+enum ElectionStage {
+    SETUP
+    ACTIVE
+    FINISHED
+}
+
+class Candidate {
+    + name: str
+    + party: str
+    + address: str
+    + registered: bool
+    + vote_count: int
+}
+
+class Voter {
+    + address: str
+    + private_key: Optional[str]
+    + to_export_dict() -> dict
+}
+
+class VoteReceipt {
+    + tx_hash: str
+    + block_number: int
+    + voter_address: str
+    + candidate_address: str
+    + qr_bytes: Optional[bytes]
+    + to_dict() -> dict
+}
+
+class AuditCheck {
+    + check_name: str
+    + status: str
+    + details: str
+}
+
+class AuditReport {
+    + session_id: str
+    + audit_timestamp: datetime
+    + checks: List[AuditCheck]
+    + passed_count: int
+    + failed_count: int
+}
+
+class SessionContext {
+    + session_id: Optional[str]
+    + contract_address: Optional[str]
+    + deploy_block: int
+    + voters: List[Voter]
+    + candidates: List[Candidate]
+}
+
+enum PrecheckStatus {
+    OK
+    INVALID_KEY
+    NOT_WHITELISTED
+    ALREADY_VOTED
+    INSUFFICIENT_BALANCE
+    NO_CONTRACT
+    UNKNOWN_ERROR
+}
+
+class PrecheckResult {
+    + status: PrecheckStatus
+    + address: str
+    + balance_wei: int
+    + required_wei: int
+    + error_text: str
+    + is_ok(): bool
+}
+
+class ParsedError {
+    + message_key: Optional[str]
+    + raw_message: str
+    + action_key: Optional[str]
+    + action_id: Optional[str]
+}
+
+class VoterStatus {
+    + key_valid: bool
+    + address: str
+    + is_whitelisted: Optional[bool]
+    + has_voted: Optional[bool]
+    + balance_eth: Optional[str]
+    + stage_name: Optional[str]
+    + error: Optional[str]
+}
+
+note right of ParsedError
+  Возвращает ключи i18n вместо
+  жестко заданных строк. UI сам
+  вызывает t(message_key) и t(action_key),
+  сохраняя разделение слоев.
+end note
+
+note right of VoterStatus
+  Агрегированный снимок для вкладки VoteTab.
+  Формируется через AppController.get_voter_status(),
+  чтобы избежать 3 синхронных RPC-вызовов
+  из потока UI.
+end note
+
+SessionContext "1" *-- "много" Voter : агрегация
+SessionContext "1" *-- "много" Candidate : агрегация
+AuditReport "1" *-- "много" AuditCheck : композиция
+
+PrecheckResult --> PrecheckStatus : использует
+
+@enduml

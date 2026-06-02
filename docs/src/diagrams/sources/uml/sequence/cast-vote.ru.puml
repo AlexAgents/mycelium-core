@@ -1,0 +1,56 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма последовательности: Подача голоса
+
+actor "Избиратель" as User
+participant "Вкладка Vote" as UI
+participant "VoteWorker" as Worker
+participant "AppController" as AC
+participant "VotingService" as VS
+participant "NonceManager" as NM
+participant "Web3Provider" as WP
+
+User -> UI : выбирает кандидата, нажимает "Подача голоса"
+activate UI
+UI -> AC : precheck_vote(private_key)
+activate AC
+note over AC : Валидирует ключ, whitelist,\nhas_voted, баланс
+AC --> UI : возвращает PrecheckResult (OK)
+deactivate AC
+
+UI -> Worker : create(key, candidate_addr)
+UI -> Worker : start()
+activate Worker
+UI -> UI : set_button_disabled()
+
+Worker -> AC : cast_vote()
+activate AC
+AC -> VS : cast_vote(key, candidate_addr)
+activate VS
+VS -> NM : get_next_нетnce(address)
+activate NM
+NM --> VS : возвращает нетnce
+deactivate NM
+VS -> WP : send_raw_transaction(signed_tx)
+activate WP
+WP --> VS : возвращает tx_hash
+deactivate WP
+VS -> WP : wait_for_receipt(tx_hash)
+activate WP
+WP --> VS : возвращает квитанцию (block_number)
+deactivate WP
+VS --> AC : возвращает VoteReceipt
+deactivate VS
+AC --> Worker : возвращает VoteReceipt
+deactivate AC
+
+Worker --> UI : finished.emit(receipt)
+deactivate Worker
+UI -> UI : generate_qr_receipt()
+UI -> UI : clear_private_key_field()
+UI -> UI : show Toast("Vote Cast!")
+UI --> User : показывает TX Hash и QR-код
+deactivate UI
+
+@enduml

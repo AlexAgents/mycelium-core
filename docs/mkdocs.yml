@@ -1,0 +1,188 @@
+# ──────────────────────────────────────────────────────────────────
+# MYCELIUM CORE — MkDocs configuration
+# ──────────────────────────────────────────────────────────────────
+extra:
+  version: 1.0.1
+site_name: MYCELIUM CORE Documentation
+site_url: http://localhost:8000/
+site_author: AlexAgents
+site_description: >
+  Technical documentation and architecture specifications for
+  MYCELIUM CORE — a research sandbox for blockchain-based voting
+  on a private Ethereum network.
+
+docs_dir: src
+
+# Тема оформления
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+# Плагины
+plugins:
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: ru
+          name: Русский
+          build: true
+  - search
+  - glightbox
+
+# Markdown расширения
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+      linenums: false
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# Карта навигации
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - First Run: getting-started/first-run.md
+    - Quick Tour: getting-started/quick-tour.md
+
+  - User Guide:
+    - Overview: user-guide/overview.md
+    - Admin Tab: user-guide/admin-tab.md
+    - Vote Tab: user-guide/vote-tab.md
+    - Audit Tab: user-guide/audit-tab.md
+    - Logs Tab: user-guide/logs-tab.md
+
+  - Architecture:
+    - Overview: architecture/overview.md
+    - System Layers: architecture/layers.md
+    - Components: architecture/components.md
+    - Data Flow: architecture/data-flow.md
+    - "ADR-001: PyQt6 Choice": architecture/decisions/adr-001-pyqt6-choice.md
+    - "ADR-002: Geth Dev Mode": architecture/decisions/adr-002-geth-dev-mode.md
+    - "ADR-003: Ephemeral Chain": architecture/decisions/adr-003-ephemeral-chain.md
+    - "ADR-004: One Session One Vote": architecture/decisions/adr-004-one-session-one-vote.md
+    - "ADR-005: i18n Runtime Switch": architecture/decisions/adr-005-i18n-runtime-switch.md
+    - "ADR-006: Layered Architecture": architecture/decisions/adr-006-layered-architecture.md
+    - "ADR-007: ErrorParser Separation": architecture/decisions/adr-007-error-parser-separation.md
+
+  - Diagrams:
+    - Catalog: diagrams/index.md
+    - Architecture:
+      - Component: diagrams/architecture/component-diagram.md
+      - Class: diagrams/architecture/class-diagram.md
+      - Deployment: diagrams/architecture/deployment-diagram.md
+      - C4 Context: diagrams/architecture/c4-context.md
+    - Sequence:
+      - Deploy Contract: diagrams/sequence/deploy-contract.md
+      - Cast Vote: diagrams/sequence/cast-vote.md
+      - Mass Vote: diagrams/sequence/mass-vote.md
+      - New Session: diagrams/sequence/new-session.md
+      - Reset Blockchain: diagrams/sequence/reset-blockchain.md
+      - Geth Crash Recovery: diagrams/sequence/geth-crash-recovery.md
+    - State:
+      - Voting Lifecycle: diagrams/state/voting-lifecycle.md
+      - Session States: diagrams/state/session-states.md
+      - Geth States: diagrams/state/geth-states.md
+    - Activity:
+      - Pre-vote Validation: diagrams/activity/precheck-vote.md
+      - Geth Startup: diagrams/activity/geth-startup.md
+      - Auditor Pipeline: diagrams/activity/audit-process.md
+    - Use Case:
+      - System Use Cases: diagrams/usecase/system-use-cases.md
+    - "Business Processes (BPMN)":
+      - "Setup Phase": diagrams/bpmn/voting-setup-phase.md
+      - "Voting Phase": diagrams/bpmn/voting-cast-phase.md
+      - Audit Workflow: diagrams/bpmn/audit-workflow.md
+      - Session Lifecycle: diagrams/bpmn/session-lifecycle.md
+      - Error Handling: diagrams/bpmn/error-handling.md
+      - Mass Vote Pipeline: diagrams/bpmn/mass-vote-pipeline.md
+
+  - API Reference:
+    - Overview: api/index.md
+    - AppController: api/controller.md
+    - VotingService: api/voting-service.md
+    - AuditService: api/audit-service.md
+    - ErrorParser: api/error-parser.md
+    - Precheck: api/precheck.md
+    - GethManager: api/geth-manager.md
+    - NonceManager: api/nonce-manager.md
+    - Web3Provider: api/web3-provider.md
+    - CompilerService: api/compiler-service.md
+    - Models: api/models.md
+
+  - UI Design:
+    - Design System: ui-design/design-system.md
+    - Color Palette: ui-design/color-palette.md
+    - Typography: ui-design/typography.md
+    - Components: ui-design/components.md
+    - Icons: ui-design/icons.md
+    - Figma Mockups: ui-design/figma-mockups.md
+
+  - Deployment:
+    - From Source: deployment/from-source.md
+    - PyInstaller Build: deployment/pyinstaller.md
+    - Distribution: deployment/distribution.md
+    - Troubleshooting: deployment/troubleshooting.md
+
+  - Security:
+    - Threat Model: security/threat-model.md
+    - "Security Checks (SEC-01..06)": security/sec-checks.md
+    - Audit Procedure: security/audit-procedure.md
+    - Known Limitations: security/known-limitations.md
+
+  - Development:
+    - IDE Setup: development/setup.md
+    - Testing: development/testing.md
+    - Style Guide: development/style-guide.md
+    - Contributing: development/contributing.md
+    - Git Workflow: development/git-workflow.md
+
+  - Reference:
+    - SRS: reference/srs.md
+    - Documentation SRS: reference/srs-docs.md
+    - Changelog: reference/changelog.md
+    - Glossary: reference/glossary.md
+    - FAQ: reference/faq.md
+    - License: reference/license.md

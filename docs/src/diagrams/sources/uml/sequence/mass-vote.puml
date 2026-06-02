@@ -1,0 +1,51 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Sequence Diagram - Mass Vote Process
+
+actor "Administrator" as Admin
+participant "VoteTab" as UI
+participant "MassVoteWorker" as Worker
+participant "AppController" as AC
+participant "VotingService" as VS
+participant "Web3Provider" as WP
+
+Admin -> UI : click "From Session" / "From JSON"
+activate UI
+UI -> UI : _check_stage_for_voting()
+UI -> Worker : create(voters_list, candidates_list)
+UI -> Worker : start()
+activate Worker
+
+loop for each voter in list
+  Worker -> AC : precheck_vote(voter.key)
+  activate AC
+  AC --> Worker : returns PrecheckResult
+  deactivate AC
+
+  alt precheck is OK
+    Worker -> AC : cast_vote(private_key, candidate)
+    activate AC
+    AC -> VS : cast_vote()
+    activate VS
+    VS -> WP : send_transaction()
+    activate WP
+    WP --> VS : tx_hash
+    deactivate WP
+    VS --> AC : receipt
+    deactivate VS
+    AC --> Worker : success
+    deactivate AC
+  else precheck failed
+    note over Worker : Skip voter,\nlog skip reason
+  end
+end
+
+Worker --> UI : finished.emit(summary_results)
+deactivate Worker
+
+UI -> UI : show Toast(voted_count, skipped_count)
+UI --> Admin : renders results log
+deactivate UI
+
+@enduml

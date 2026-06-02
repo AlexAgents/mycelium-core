@@ -1,0 +1,33 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма последовательности: Мониторинг и восстановление Geth
+
+participant "GethManager" as GM
+participant "MonitorThread" as MT
+participant "AppController" as AC
+participant "Главное окно" as MW
+
+activate GM
+GM -> MT : start()
+activate MT
+
+loop пока Geth запущен
+    MT -> MT : sleep(2)
+    alt Процесс Geth завершился И НЕ shutting_down
+        MT --> AC : _on_geth_crash()
+        activate AC
+        AC --> MW : _crash_signal.emit()
+        activate MW
+        deactivate AC
+        
+        MW -> MW : _show_crash_dialog()
+        note over MW : Блокирует UI, показывает ошибку\n"Узел Geth упал"
+        deactivate MW
+        note over MT : Завершает цикл мониторинга
+    end
+end
+deactivate MT
+deactivate GM
+
+@enduml

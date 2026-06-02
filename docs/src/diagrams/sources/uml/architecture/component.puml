@@ -1,0 +1,121 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Component Diagram (UML) - MYCELIUM CORE
+
+package "Presentation Layer (UI)" {
+  [MainWindow] as MW
+  [AdminTab] as AT
+  [VoteTab] as VT
+  [AuditTab] as AudT
+  [LogsTab] as LT
+
+  MW --> AT : embeds
+  MW --> VT : embeds
+  MW --> AudT : embeds
+  MW --> LT : embeds
+}
+
+package "UI Workers (QThread)" {
+  [DeployWorker] as DW
+  [VoteWorker] as VW
+  [MassVoteWorker] as MVW
+  [VoterStatusWorker] as VSW
+  [FundVotersWorker] as FVW
+  [FundFromDevWorker] as FFDW
+  [WhitelistWorker] as WLW
+  [RegisterCandidatesWorker] as RCW
+  [StageWorker] as SW
+  [ResetBlockchainWorker] as RBW
+
+  AT ..> DW : spawns
+  AT ..> FVW : spawns
+  AT ..> FFDW : spawns
+  AT ..> WLW : spawns
+  AT ..> RCW : spawns
+  AT ..> SW : spawns
+
+  VT ..> VW : spawns
+  VT ..> MVW : spawns
+  VT ..> VSW : spawns
+
+  MW ..> RBW : spawns
+}
+
+package "Application Layer (Facade)" {
+  [AppController] as AC
+
+  AT --> AC : calls
+  VT --> AC : calls
+  AudT --> AC : calls
+  LT --> AC : reads
+  MW --> AC : monitors
+
+  DW --> AC : delegates
+  VW --> AC : delegates
+  MVW --> AC : delegates
+  VSW --> AC : delegates
+  FVW --> AC : delegates
+  FFDW --> AC : delegates
+  WLW --> AC : delegates
+  RCW --> AC : delegates
+  SW --> AC : delegates
+  RBW --> AC : delegates
+}
+
+package "Domain / Service Layer" {
+  [VotingService] as VS
+  [AuditService] as AS
+  [ErrorParser] as EP
+  [PrecheckValidator] as PV
+
+  AC --> VS : delegates
+  AC --> AS : delegates
+  AC --> EP : delegates
+  AC --> PV : delegates
+}
+
+package "Infrastructure Layer" {
+  [Web3Provider] as WP
+  [GethManager] as GM
+  [NonceManager] as NM
+  [CompilerService] as CS
+
+  VS --> WP : RPC
+  VS --> NM : nonces
+  AS --> WP : events
+  AC --> GM : controls
+  AC --> CS : compiles
+}
+
+database "Local Storage" {
+  [app.cfg] as CFG
+  [.env] as ENV
+  [session.log] as LOG
+
+  AC --> CFG : loads/saves
+  AC --> ENV : loads
+  AC --> LOG : archives
+}
+
+node "External Process" {
+  component "geth.exe (PID)" as GETH
+  component "solc.exe" as SOLC
+
+  GM --> GETH : spawns/monitors
+  CS --> SOLC : executes
+}
+
+node "Blockchain Node" {
+  [VotingCore Contract] as VC
+  WP --> VC : Web3 calls
+}
+
+note right of VSW
+  Added in v1.0.1:
+  non-blocking voter status query
+  for VoteTab (fixed UI freeze
+  on private key input).
+end note
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма активности: Выполнение конвейера аудитора
+
+start
+
+:Аудитор выбирает режим аудита\n(Full / Pre / Live / Final);
+:Запрос текущей стадии контракта;
+
+if (Доступен ли режим для текущей стадии?) then (нет)
+    :Показ предупреждения о недоступности;
+    :Отключение кнопки "Run Audit";
+    stop
+else (да)
+    :Инициализация AuditService;
+    :Загрузка событий от deploy_block до последнего;
+
+    if (Режим == Pre-vote?) then (да)
+        fork
+            :Проверка количества кандидатов (>= 2);
+        fork again
+            :Проверка заполненности Whitelist;
+        fork again
+            :Проверка Stage == SETUP;
+        end fork
+    else (Live / Final / Full)
+        fork
+            :Проверка двойного голосования (SEC-01);
+        fork again
+            :Проверка соблюдения Whitelist (SEC-02);
+        fork again
+            :Проверка соблюдения стадий (SEC-03);
+        fork again
+            :Валидация кандидатов (SEC-04);
+        fork again
+            :Проверка действий владельца (SEC-05);
+        fork again
+            :Проверка целостности подсчета (SEC-06);
+        end fork
+    endif
+
+    :Сборка AuditReport;
+    :Подсчет голосов и % явки;
+    :Определение победителя / ничьей;
+    :Обновление UI аудита;
+    :Разблокировка экспорта (Copy / JSON / CSV);
+    stop
+endif
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Deployment Diagram (UML) - MYCELIUM CORE
+
+node "Developer's OS (Windows 10/11)" {
+  package "Python Runtime Environment (v3.11+)" {
+    artifact "MYCELIUM CORE Executable" as EXE <<file>>
+    component "PyQt6 Event Loop" as QT <<subsystem>>
+    component "Web3.py Client" as W3 <<library>>
+
+    EXE ..> QT : runs
+    EXE ..> W3 : uses
+  }
+
+  node "Local Filesystem" {
+    folder "data/" {
+      file "app.cfg" as FILE_CFG
+      file ".env" as FILE_ENV
+      folder "chain-data/" as DATA_DIR
+      folder "logs/" as LOGS_DIR
+      folder "exports/" as EXPORTS_DIR
+      folder "runtime/" as RUNTIME_DIR
+    }
+  }
+
+  node "Geth Sandbox Process" as GETH_NODE {
+    component "Geth Engine (go-ethereum)" as GETH_EXEC
+    port "JSON-RPC (8545)" as PORT_RPC
+    
+    GETH_EXEC - PORT_RPC
+  }
+
+  node "py-solc-x (Solidity Compiler)" as SOLC_NODE {
+    component "solc binary" as SOLC_EXEC
+  }
+}
+
+W3 ---> PORT_RPC : TCP / HTTP Loopback
+EXE ---> FILE_CFG : reads/writes
+EXE ---> FILE_ENV : reads
+GETH_EXEC ---> DATA_DIR : writes blocks
+EXE ---> LOGS_DIR : appends/archives
+EXE ---> SOLC_EXEC : compiles contract via CLI
+
+@enduml

@@ -1,7 +1,0 @@
-{
-    "admin": "Admin",
-    "vote": "Vote",
-    "audit": "Audit",
-    "deploy": "Deploy contract",
-    "cast_vote": "Cast vote"
-  }

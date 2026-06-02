@@ -1,0 +1,42 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма последовательности: Новая сессия (Быстрый режим)
+
+actor "Администратор" as Admin
+participant "Главное окно" as MW
+participant "AppController" as AC
+participant "VotingService" as VS
+participant "Вкладка Admin" as AT
+participant "Вкладка Vote" as VT
+
+Admin -> MW : нажимает "New Session"
+activate MW
+MW -> MW : confirm_dialog()
+note over MW : Пользователь подтверждает сброс
+
+MW -> AC : new_session()
+activate AC
+AC -> AC : archive_session_log(session_id)
+note over AC : Копирует активный лог\nв папку архива
+AC -> VS : reset()
+note over VS : Очищает ссылку на\nконтракт в ОЗУ
+AC -> AC : create_session() (new UUID)
+AC --> MW : сессия создана
+deactivate AC
+
+MW -> AT : reset_ui()
+activate AT
+AT --> MW : UI очищен
+deactivate AT
+
+MW -> VT : reset_ui()
+activate VT
+VT --> MW : UI очищен
+deactivate VT
+
+MW -> MW : обновляет статусы на Setup
+MW --> Admin : готов к новому деплою
+deactivate MW
+
+@enduml

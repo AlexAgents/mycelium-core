@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_cast" targetNamespace="http://mycelium.core/bpmn/cast" exporter="Camunda Modeler" exporterVersion="5.46.1">
+  <bpmn:collaboration id="Collab_cast">
+    <bpmn:participant id="Pool_Voter" name="Voter" processRef="Proc_Voter" />
+    <bpmn:participant id="Pool_System" name="System / Blockchain" processRef="Proc_System" />
+    <bpmn:messageFlow id="MF_tx" name="Signed castVote TX" sourceRef="T_V_Cast" targetRef="T_S_Precheck" />
+    <bpmn:messageFlow id="MF_ok" name="TX Receipt + QR" sourceRef="T_S_Receipt" targetRef="T_V_QR" />
+    <bpmn:messageFlow id="MF_fail" name="Error message" sourceRef="EE_S_Fail" targetRef="T_V_Error" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proc_Voter" isExecutable="false">
+    <bpmn:startEvent id="SE_V" name="Voter has private key" />
+    <bpmn:userTask id="T_V_Key" name="Enter private key&#10;(or Load JSON)" />
+    <bpmn:userTask id="T_V_LoadCand" name="Load Candidates&#10;from chain" />
+    <bpmn:userTask id="T_V_Select" name="Select one candidate&#10;(radio button)" />
+    <bpmn:userTask id="T_V_Cast" name="Click CAST VOTE" />
+    <bpmn:exclusiveGateway id="GW_V" name="TX success?" />
+    <bpmn:sequenceFlow id="fv1" sourceRef="SE_V" targetRef="T_V_Key" />
+    <bpmn:sequenceFlow id="fv2" sourceRef="T_V_Key" targetRef="T_V_LoadCand" />
+    <bpmn:sequenceFlow id="fv3" sourceRef="T_V_LoadCand" targetRef="T_V_Select" />
+    <bpmn:sequenceFlow id="fv4" sourceRef="T_V_Select" targetRef="T_V_Cast" />
+    <bpmn:sequenceFlow id="fv5" sourceRef="T_V_Cast" targetRef="GW_V" />
+    <bpmn:sequenceFlow id="fv6" name="Yes" sourceRef="GW_V" targetRef="T_V_QR" />
+    <bpmn:sequenceFlow id="fv7" name="No" sourceRef="GW_V" targetRef="T_V_Error" />
+    <bpmn:sequenceFlow id="fv8" sourceRef="T_V_QR" targetRef="EE_V_OK" />
+    <bpmn:sequenceFlow id="fv9" sourceRef="T_V_Error" targetRef="EE_V_Fail" />
+    <bpmn:userTask id="T_V_QR" name="View TX Hash&#10;+ QR Receipt" />
+    <bpmn:userTask id="T_V_Error" name="Error dialog&#10;(translated message)" />
+    <bpmn:endEvent id="EE_V_Fail" name="Vote rejected" />
+    <bpmn:endEvent id="EE_V_OK" name="Vote recorded" />
+  </bpmn:process>
+  <bpmn:process id="Proc_System" isExecutable="false">
+    <bpmn:startEvent id="SE_S" name="TX received" />
+    <bpmn:serviceTask id="T_S_Precheck" name="5-level precheck&#10;(key, contract, WL,&#10;voted, balance)" />
+    <bpmn:exclusiveGateway id="GW_S" name="Precheck OK?" />
+    <bpmn:serviceTask id="T_S_Sign" name="Sign TX&#10;(NonceManager)" />
+    <bpmn:serviceTask id="T_S_Broadcast" name="Broadcast to Geth&#10;(send_raw_transaction)" />
+    <bpmn:serviceTask id="T_S_Wait" name="Wait for receipt&#10;(120s timeout)" />
+    <bpmn:serviceTask id="T_S_Receipt" name="Generate VoteReceipt&#10;+ QR code" />
+    <bpmn:endEvent id="EE_S_OK" name="VoteCast event emitted" />
+    <bpmn:sequenceFlow id="fs1" sourceRef="SE_S" targetRef="T_S_Precheck" />
+    <bpmn:sequenceFlow id="fs2" sourceRef="T_S_Precheck" targetRef="GW_S" />
+    <bpmn:sequenceFlow id="fs3" name="Yes" sourceRef="GW_S" targetRef="T_S_Sign" />
+    <bpmn:sequenceFlow id="fs4" name="No" sourceRef="GW_S" targetRef="EE_S_Fail" />
+    <bpmn:sequenceFlow id="fs5" sourceRef="T_S_Sign" targetRef="T_S_Broadcast" />
+    <bpmn:sequenceFlow id="fs6" sourceRef="T_S_Broadcast" targetRef="T_S_Wait" />
+    <bpmn:sequenceFlow id="fs7" sourceRef="T_S_Wait" targetRef="T_S_Receipt" />
+    <bpmn:sequenceFlow id="fs8" sourceRef="T_S_Receipt" targetRef="EE_S_OK" />
+    <bpmn:endEvent id="EE_S_Fail" name="Error returned" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_cast">
+    <bpmndi:BPMNPlane id="Plane_cast" bpmnElement="Collab_cast">
+      <bpmndi:BPMNShape id="Pool_Voter_di" bpmnElement="Pool_Voter" isHorizontal="true">
+        <dc:Bounds x="160" y="60" width="1200" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_V_di" bpmnElement="SE_V">
+        <dc:Bounds x="210" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_Key_di" bpmnElement="T_V_Key">
+        <dc:Bounds x="280" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_LoadCand_di" bpmnElement="T_V_LoadCand">
+        <dc:Bounds x="430" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_Select_di" bpmnElement="T_V_Select">
+        <dc:Bounds x="580" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_Cast_di" bpmnElement="T_V_Cast">
+        <dc:Bounds x="730" y="130" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_V_di" bpmnElement="GW_V" isMarkerVisible="true">
+        <dc:Bounds x="885" y="145" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="878.5" y="121" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_QR_di" bpmnElement="T_V_QR">
+        <dc:Bounds x="1130" y="90" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_V_Error_di" bpmnElement="T_V_Error">
+        <dc:Bounds x="960" y="180" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_V_Fail_di" bpmnElement="EE_V_Fail">
+        <dc:Bounds x="1132" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1118" y="243" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_V_OK_di" bpmnElement="EE_V_OK">
+        <dc:Bounds x="1292" y="112" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1276" y="153" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fv1_di" bpmnElement="fv1">
+        <di:waypoint x="246" y="170" />
+        <di:waypoint x="280" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv2_di" bpmnElement="fv2">
+        <di:waypoint x="400" y="170" />
+        <di:waypoint x="430" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv3_di" bpmnElement="fv3">
+        <di:waypoint x="550" y="170" />
+        <di:waypoint x="580" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv4_di" bpmnElement="fv4">
+        <di:waypoint x="700" y="170" />
+        <di:waypoint x="730" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv5_di" bpmnElement="fv5">
+        <di:waypoint x="850" y="170" />
+        <di:waypoint x="885" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv6_di" bpmnElement="fv6">
+        <di:waypoint x="935" y="170" />
+        <di:waypoint x="958" y="170" />
+        <di:waypoint x="958" y="130" />
+        <di:waypoint x="1130" y="130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1010" y="113" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv7_di" bpmnElement="fv7">
+        <di:waypoint x="910" y="195" />
+        <di:waypoint x="910" y="220" />
+        <di:waypoint x="960" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918" y="199" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv8_di" bpmnElement="fv8">
+        <di:waypoint x="1250" y="130" />
+        <di:waypoint x="1292" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fv9_di" bpmnElement="fv9">
+        <di:waypoint x="1080" y="220" />
+        <di:waypoint x="1132" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Pool_System_di" bpmnElement="Pool_System" isHorizontal="true">
+        <dc:Bounds x="160" y="380" width="1200" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SE_S_di" bpmnElement="SE_S">
+        <dc:Bounds x="210" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Precheck_di" bpmnElement="T_S_Precheck">
+        <dc:Bounds x="280" y="450" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GW_S_di" bpmnElement="GW_S" isMarkerVisible="true">
+        <dc:Bounds x="440" y="465" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="429" y="525" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Sign_di" bpmnElement="T_S_Sign">
+        <dc:Bounds x="530" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Broadcast_di" bpmnElement="T_S_Broadcast">
+        <dc:Bounds x="680" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Wait_di" bpmnElement="T_S_Wait">
+        <dc:Bounds x="830" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_S_Receipt_di" bpmnElement="T_S_Receipt">
+        <dc:Bounds x="980" y="430" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_S_OK_di" bpmnElement="EE_S_OK">
+        <dc:Bounds x="1132" y="452" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EE_S_Fail_di" bpmnElement="EE_S_Fail">
+        <dc:Bounds x="447" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="494.5" y="403" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="fs1_di" bpmnElement="fs1">
+        <di:waypoint x="246" y="490" />
+        <di:waypoint x="280" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs2_di" bpmnElement="fs2">
+        <di:waypoint x="410" y="490" />
+        <di:waypoint x="440" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs3_di" bpmnElement="fs3">
+        <di:waypoint x="490" y="490" />
+        <di:waypoint x="530" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="500" y="473" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs4_di" bpmnElement="fs4">
+        <di:waypoint x="465" y="465" />
+        <di:waypoint x="465" y="428" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="472" y="443" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs5_di" bpmnElement="fs5">
+        <di:waypoint x="650" y="470" />
+        <di:waypoint x="680" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs6_di" bpmnElement="fs6">
+        <di:waypoint x="800" y="470" />
+        <di:waypoint x="830" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs7_di" bpmnElement="fs7">
+        <di:waypoint x="950" y="470" />
+        <di:waypoint x="980" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="fs8_di" bpmnElement="fs8">
+        <di:waypoint x="1100" y="470" />
+        <di:waypoint x="1132" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_tx_di" bpmnElement="MF_tx">
+        <di:waypoint x="790" y="210" />
+        <di:waypoint x="790" y="320" />
+        <di:waypoint x="345" y="320" />
+        <di:waypoint x="345" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="700" y="286" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ok_di" bpmnElement="MF_ok">
+        <di:waypoint x="1042" y="430" />
+        <di:waypoint x="1042" y="300" />
+        <di:waypoint x="1210" y="300" />
+        <di:waypoint x="1210" y="170" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="312" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_fail_di" bpmnElement="MF_fail">
+        <di:waypoint x="465" y="392" />
+        <di:waypoint x="465" y="360" />
+        <di:waypoint x="1020" y="360" />
+        <di:waypoint x="1020" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="934" y="343" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

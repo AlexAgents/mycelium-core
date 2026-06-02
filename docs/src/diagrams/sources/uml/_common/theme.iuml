@@ -1,0 +1,71 @@
+' =================================================================
+' MYCELIUM CORE — Единая тема для PlantUML-диаграмм
+' Цветовая палитра: Сине-навигационная, соответствующая UI
+' =================================================================
+
+!define PRIMARY_COLOR #0969da
+!define BORDER_COLOR #c4d3e8
+!define BG_COLOR #f4f7fb
+!define TEXT_COLOR #1f3a68
+!define MUTED_COLOR #7286a5
+!define SUCCESS_COLOR #3fb950
+!define ERROR_COLOR #cf222e
+!define WARNING_COLOR #bf8700
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam defaultFontColor TEXT_COLOR
+skinparam shadowing false
+skinparam RoundCorner 6
+
+' Стили для классов и типов данных
+skinparam class {
+    BackgroundColor BG_COLOR
+    BorderColor BORDER_COLOR
+    HeaderBackgroundColor #e7eef7
+    FontColor TEXT_COLOR
+    AttributeFontColor MUTED_COLOR
+    AttributeFontSize 11
+}
+
+' Стили для компонентов
+skinparam component {
+    BackgroundColor BG_COLOR
+    BorderColor BORDER_COLOR
+    FontColor TEXT_COLOR
+}
+
+' Стили для диаграмм последовательности (Sequence)
+skinparam sequence {
+    ArrowColor PRIMARY_COLOR
+    LifeLineBorderColor BORDER_COLOR
+    LifeLineBackgroundColor BG_COLOR
+    ParticipantBackgroundColor #e7eef7
+    ParticipantBorderColor BORDER_COLOR
+    ParticipantFontColor TEXT_COLOR
+    BoxBackgroundColor #f4f7fb
+    BoxBorderColor BORDER_COLOR
+}
+
+' Стили для стейт-машин (State)
+skinparam state {
+    BackgroundColor BG_COLOR
+    BorderColor BORDER_COLOR
+    StartColor SUCCESS_COLOR
+    EndColor ERROR_COLOR
+}
+
+' Стили для активностей (Activity)
+skinparam activity {
+    BackgroundColor BG_COLOR
+    BorderColor BORDER_COLOR
+    BarColor PRIMARY_COLOR
+    StartColor PRIMARY_COLOR
+    EndColor PRIMARY_COLOR
+}
+
+' Стрелки и связи
+skinparam ArrowColor PRIMARY_COLOR
+skinparam ArrowFontColor MUTED_COLOR
+skinparam ArrowFontSize 10

@@ -1,0 +1,51 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Activity Diagram - Auditor Pipeline Execution
+
+start
+
+:Auditor selects audit mode\n(Full / Pre / Live / Final);
+:Query current contract stage;
+
+if (Is requested mode available for current stage?) then (no)
+    :Show availability warning;
+    :Disable "Run Audit" button;
+    stop
+else (yes)
+    :Initialize AuditService;
+    :Fetch events from block deploy_block to latest;
+
+    if (Mode == Pre-vote?) then (yes)
+        fork
+            :Check Candidate Count (>= 2);
+        fork again
+            :Check Whitelist Populated;
+        fork again
+            :Check Stage == SETUP;
+        end fork
+    else (Live / Final / Full)
+        fork
+            :Check Double Vote (SEC-01);
+        fork again
+            :Check Whitelist Enforcement (SEC-02);
+        fork again
+            :Check Stage Enforcement (SEC-03);
+        fork again
+            :Check Candidate Validation (SEC-04);
+        fork again
+            :Check Owner-only Admin (SEC-05);
+        fork again
+            :Check Vote Count Integrity (SEC-06);
+        end fork
+    endif
+
+    :Compile AuditReport;
+    :Calculate total votes & turnout %;
+    :Identify winner / tie / no-winner;
+    :Update Audit UI;
+    :Enable Copy Report / JSON / CSV export;
+    stop
+endif
+
+@enduml

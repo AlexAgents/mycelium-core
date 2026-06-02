@@ -1,0 +1,42 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Sequence Diagram - New Session (Fast Mode)
+
+actor "Administrator" as Admin
+participant "MainWindow" as MW
+participant "AppController" as AC
+participant "VotingService" as VS
+participant "AdminTab" as AT
+participant "VoteTab" as VT
+
+Admin -> MW : click "New Session"
+activate MW
+MW -> MW : confirm_dialog()
+note over MW : User confirms reset
+
+MW -> AC : new_session()
+activate AC
+AC -> AC : archive_session_log(session_id)
+note over AC : Copies active log\nto archive folder
+AC -> VS : reset()
+note over VS : Clears contract\nreference in RAM
+AC -> AC : create_session() (new UUID)
+AC --> MW : session created
+deactivate AC
+
+MW -> AT : reset_ui()
+activate AT
+AT --> MW : UI cleared
+deactivate AT
+
+MW -> VT : reset_ui()
+activate VT
+VT --> MW : UI cleared
+deactivate VT
+
+MW -> MW : update status labels to Setup
+MW --> Admin : ready for new deploy
+deactivate MW
+
+@enduml

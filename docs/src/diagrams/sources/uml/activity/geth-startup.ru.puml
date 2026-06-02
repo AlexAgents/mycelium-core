@@ -1,0 +1,39 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Диаграмма активности: Запуск процесса Geth
+
+start
+:Проверка наличия geth.exe;
+if (Существует?) then (нет)
+  :Выброс FileNotFoundError;
+  stop
+else (да)
+  :Принудительное завершение зомби-процессов geth;
+  :Проверка занятости порта 8545;
+  if (Порт занят?) then (да)
+    :Принудительный taskkill /F /IM geth.exe;
+    :Ожидание 2 секунды;
+    if (Порт всё ещё занят?) then (да)
+      :Выброс RuntimeError;
+      stop
+    else (нет)
+    endif
+  else (нет)
+  endif
+
+  :Запуск подпроцесса Geth;
+  :Запуск MonitorThread;
+  :Цикл опроса RPC (таймаут 30с);
+  
+  if (RPC подключен?) then (да)
+    :Установка состояния Geth в Running;
+    :Возврат успеха;
+    stop
+  else (нет)
+    :Выброс RuntimeError ("RPC недоступен");
+    stop
+  endif
+endif
+
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+!include ../_common/theme.iuml
+
+title C4 Context Diagram (Level 1) - MYCELIUM CORE
+
+actor "Administrator" as ADMIN
+actor "Voter" as VOTER
+actor "Auditor" as AUDITOR
+
+package "MYCELIUM CORE (System Boundary)" {
+  component "GUI Application" as APP
+  database "Config & Logs" as FILES
+}
+
+node "Local Geth Node" as GETH
+node "py-solc-x (Solidity Compiler)" as SOLC
+
+ADMIN --> APP : Manages election, candidates, whitelist
+VOTER --> APP : Submits private key, casts vote
+AUDITOR --> APP : Runs security audits, exports results
+
+APP --> GETH : Sends JSON-RPC calls / VC Contract
+APP --> FILES : Reads config / writes logs
+APP --> SOLC : Compiles contract via CLI
+
+@enduml

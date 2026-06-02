@@ -1,0 +1,38 @@
+# ==========================================
+# MYCELIUM CORE Docs
+# ==========================================
+
+# MkDocs build output
+site/
+
+# Python cache & Virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+venv/
+env/
+.venv/
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# PlantUML
+plantuml.jar
+*.atmp
+
+# Java PlantUML logs
+hs_err_pid*.log
+
+# MkDocs temp directories
+.cache/
+
+# PlantUML bin
+plantuml.jar

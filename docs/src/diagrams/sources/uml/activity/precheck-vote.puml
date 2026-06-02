@@ -1,0 +1,38 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Activity Diagram - Pre-vote Validation (5 Levels)
+
+start
+
+:Voter submits private key;
+if (Is private key valid?) then (no)
+    :Return INVALID_KEY;
+    end
+else (yes)
+    :Derive Ethereum Address;
+    if (Is contract deployed?) then (no)
+        :Return NO_CONTRACT;
+        end
+    else (yes)
+        if (Is address whitelisted?) then (no)
+            :Return NOT_WHITELISTED;
+            end
+        else (yes)
+            if (Has address already voted?) then (yes)
+                :Return ALREADY_VOTED;
+                end
+            else (no)
+                if (Balance >= 0.0003 ETH?) then (no)
+                    :Return INSUFFICIENT_BALANCE;
+                    end
+                else (yes)
+                    :Return OK;
+                    stop
+                endif
+            endif
+        endif
+    endif
+endif
+
+@enduml

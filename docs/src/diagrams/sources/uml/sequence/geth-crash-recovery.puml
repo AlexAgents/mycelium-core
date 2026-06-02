@@ -1,0 +1,33 @@
+@startuml
+!include ../_common/theme.iuml
+
+title Sequence Diagram - Geth Crash Monitoring & Recovery
+
+participant "GethManager" as GM
+participant "MonitorThread" as MT
+participant "AppController" as AC
+participant "MainWindow" as MW
+
+activate GM
+GM -> MT : start()
+activate MT
+
+loop while Geth is running
+    MT -> MT : sleep(2)
+    alt Geth process exited and NOT shutting_down
+        MT --> AC : _on_geth_crash()
+        activate AC
+        AC --> MW : _crash_signal.emit()
+        activate MW
+        deactivate AC
+        
+        MW -> MW : _show_crash_dialog()
+        note over MW : Blocks UI, shows error\n"Geth node crashed"
+        deactivate MW
+        note over MT : Terminate monitor loop
+    end
+end
+deactivate MT
+deactivate GM
+
+@enduml
