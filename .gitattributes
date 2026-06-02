@@ -1,0 +1,7 @@
+# Exclude scripts from language detection
+mycelium-core/scripts/*.bat linguist-vendored
+mycelium-core/scripts/*.ps1 linguist-vendored
+mycelium-core/scripts/*.sh linguist-vendored
+
+# Documentation is not code
+docs/** linguist-documentation

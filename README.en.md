@@ -44,8 +44,6 @@ interface.
 The project demonstrates the complete lifecycle of on-chain elections,
 including preparation, voting, and event-driven cryptographic auditing.
 
----
-
 ## Artifacts
 
 | Category | Artifact | Count | Link |
@@ -62,8 +60,6 @@ including preparation, voting, and event-driven cryptographic auditing.
 | Tests | Unit + Integration (real Geth) | 180 passed | [Testing](docs/src/development/testing.md) |
 | Glossary | Terms and abbreviations | 33 terms | [Glossary](docs/src/reference/glossary.md) |
 | FAQ | Common questions | 16 questions | [FAQ](docs/src/reference/faq.md) |
-
----
 
 ## Architecture
 
@@ -93,8 +89,6 @@ libraries directly.
 └─────────────────────────────────────┘
 ```
 
----
-
 ## Design
 
 UI mockups with a complete annotation system are maintained in Figma.
@@ -112,12 +106,10 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 [Color Palette](docs/src/ui-design/color-palette.md) |
 [Figma Structure](docs/src/ui-design/figma-mockups.md)
 
----
-
 ## Screenshots
 
 <details>
-<summary>🖥️ Admin Tab — contract deployment, candidates, voters, stage control</summary>
+<summary>Admin Tab — contract deployment, candidates, voters, stage control</summary>
 
 <br>
 
@@ -128,11 +120,11 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 </tr>
 <tr>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/admin-tab-dark.png"
+<img src="docs/src/assets/images/screenshots/admin-tab-dark.png"
      alt="Admin Tab Dark" width="480">
 </td>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/admin-tab-light.png"
+<img src="docs/src/assets/images/screenshots/admin-tab-light.png"
      alt="Admin Tab Light" width="480">
 </td>
 </tr>
@@ -140,10 +132,8 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 
 </details>
 
----
-
 <details>
-<summary>🗳️ Vote Tab — voter authentication, candidate selection, QR receipt</summary>
+<summary>Vote Tab — voter authentication, candidate selection, QR receipt</summary>
 
 <br>
 
@@ -154,11 +144,11 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 </tr>
 <tr>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/vote-tab-dark.png"
+<img src="docs/src/assets/images/screenshots/vote-tab-dark.png"
      alt="Vote Tab Dark" width="480">
 </td>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/vote-tab-light.png"
+<img src="docs/src/assets/images/screenshots/vote-tab-light.png"
      alt="Vote Tab Light" width="480">
 </td>
 </tr>
@@ -166,10 +156,8 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 
 </details>
 
----
-
 <details>
-<summary>🔍 Audit Tab — SEC-checks, results, export</summary>
+<summary>Audit Tab — SEC-checks, results, export</summary>
 
 <br>
 
@@ -180,11 +168,11 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 </tr>
 <tr>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/audit-tab-dark.png"
+<img src="docs/src/assets/images/screenshots/audit-tab-dark.png"
      alt="Audit Tab Dark" width="480">
 </td>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/audit-tab-light.png"
+<img src="docs/src/assets/images/screenshots/audit-tab-light.png"
      alt="Audit Tab Light" width="480">
 </td>
 </tr>
@@ -192,10 +180,8 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 
 </details>
 
----
-
 <details>
-<summary>📋 Logs Tab — session log, live search, autoscroll</summary>
+<summary>Logs Tab — session log, live search, autoscroll</summary>
 
 <br>
 
@@ -206,11 +192,11 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 </tr>
 <tr>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/logs-tab-dark.png"
+<img src="docs/src/assets/images/screenshots/logs-tab-dark.png"
      alt="Logs Tab Dark" width="480">
 </td>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/logs-tab-light.png"
+<img src="docs/src/assets/images/screenshots/logs-tab-light.png"
      alt="Logs Tab Light" width="480">
 </td>
 </tr>
@@ -218,10 +204,8 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 
 </details>
 
----
-
 <details>
-<summary>ℹ️ Dialogs — About, Reset Blockchain</summary>
+<summary>Dialogs — About, Reset Blockchain</summary>
 
 <br>
 
@@ -232,19 +216,17 @@ Full specification: [Design System](docs/src/ui-design/design-system.md) |
 </tr>
 <tr>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/about-dialog.png"
+<img src="docs/src/assets/images/screenshots/about-dialog.png"
      alt="About Dialog" width="480">
 </td>
 <td align="center">
-<img src="mycelium-core/src/assets/images/screenshots/reset-blockchain-dialog.png"
+<img src="docs/src/assets/images/screenshots/reset-blockchain-dialog.png"
      alt="Reset Blockchain Dialog" width="480">
 </td>
 </tr>
 </table>
 
 </details>
-
----
 
 ## Quick Start
 
@@ -290,8 +272,6 @@ mkdocs serve
 # Open http://127.0.0.1:8000
 ```
 
----
-
 ## Configuration
 
 All runtime parameters are configured via `.env`.
@@ -336,8 +316,6 @@ These are hardcoded constants — change in source if needed:
 | `LOG_LEVEL` | `INFO` | Logging level: DEBUG / INFO / WARNING |
 | `SOLIDITY_VERSION` | `0.8.20` | Solidity compiler version |
 
----
-
 ## Security Invariants
 
 Critical business rules are enforced proactively on-chain and verified
@@ -351,8 +329,6 @@ reactively off-chain via `AuditService`:
 | SEC-04 | Candidates | `require(candidates[c].registered)` | Votes target registered addresses |
 | SEC-05 | Owner Actions | `onlyOwner` modifier | Admin TXs originate from contract owner |
 | SEC-06 | Vote Integrity | implicit `votes += 1` | Event count equals sum of candidate votes |
-
----
 
 ## License
 
