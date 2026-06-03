@@ -77,7 +77,7 @@ To verify there are no broken links:
 mkdocs build --strict
 ```
 
-## Key Links
+## Links
 
 | Resource | Link |
 |:---|:---|

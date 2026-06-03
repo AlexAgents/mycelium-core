@@ -13,32 +13,32 @@ For a detailed component-level view see the
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│                 PRESENTATION LAYER (UI)            │
-│                 src/ui/ (PyQt6 Widgets)            │
+│                 PRESENTATION LAYER (UI)                 │
+│                 src/ui/ (PyQt6 Widgets)                 │
 └──────────────────────────────┬──────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
-│                APPLICATION LAYER (Facade)          │
-│               src/core/app_controller.py           │
+│                APPLICATION LAYER (Facade)               │
+│               src/core/app_controller.py                │
 └──────────────────────────────┬──────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
-│                 DOMAIN / SERVICE LAYER             │
-│             src/core/ (Voting/Audit Services)      │
+│                 DOMAIN / SERVICE LAYER                  │
+│             src/core/ (Voting/Audit Services)           │
 └──────────────────────────────┬──────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
-│                  INFRASTRUCTURE LAYER              │
-│        src/core/ (Web3Provider / GethManager)      │
+│                  INFRASTRUCTURE LAYER                   │
+│        src/core/ (Web3Provider / GethManager)           │
 └──────────────────────────────┬──────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
-│                     SMART CONTRACT                 │
-│                 contracts/VotingCore.sol           │
+│                     SMART CONTRACT                      │
+│                 contracts/VotingCore.sol                │
 └─────────────────────────────────────────────────────────┘
 ```
 

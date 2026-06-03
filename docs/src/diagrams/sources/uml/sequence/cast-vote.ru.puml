@@ -28,9 +28,9 @@ Worker -> AC : cast_vote()
 activate AC
 AC -> VS : cast_vote(key, candidate_addr)
 activate VS
-VS -> NM : get_next_нетnce(address)
+VS -> NM : get_next_nonce(address)
 activate NM
-NM --> VS : возвращает нетnce
+NM --> VS : возвращает nonce
 deactivate NM
 VS -> WP : send_raw_transaction(signed_tx)
 activate WP

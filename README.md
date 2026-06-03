@@ -7,12 +7,11 @@
 
 > Настольное sandbox-приложение для моделирования, проведения и аудита
 > электронного голосования на локальной Ethereum-сети.
-> Симулятор дипломного проекта.
+> Симулятор для Master Degree Project.
 
-[![Release](https://img.shields.io/github/v/release/AlexAgents/mycelium-core?color=blue)](https://github.com/AlexAgents/mycelium-core/releases) [![License](https://img.shields.io/github/license/AlexAgents/mycelium-core?color=yellow)](LICENSE) ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white) ![PyQt6](https://img.shields.io/badge/PyQt6-6.x-41CD52?logo=qt&logoColor=white) ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?logo=solidity&logoColor=white) ![Tests](https://img.shields.io/badge/tests-180_passed-success) [![Docs](https://img.shields.io/badge/Docs-MkDocs-0969da?logo=materialformkdocs&logoColor=white)](https://github.com/AlexAgents/mycelium-core/tree/main/docs) [![Figma](https://img.shields.io/badge/Figma-Mockups-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/PWzJmLP7TrrbjcL6F85KoU/mycelium-core)
+[![Release](https://img.shields.io/github/v/release/AlexAgents/mycelium-core?color=blue&label=)](https://github.com/AlexAgents/mycelium-core/releases) [![License](https://img.shields.io/github/license/AlexAgents/mycelium-core?color=yellow&label=)](LICENSE) [![Python](https://img.shields.io/badge/Python%203.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3110/) [![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?logo=qt&logoColor=white)](https://www.riverbankcomputing.com/software/pyqt/) [![Solidity](https://img.shields.io/badge/Solidity%200.8.20-363636?logo=solidity&logoColor=white)](https://docs.soliditylang.org/en/v0.8.20/) [![Tests](https://img.shields.io/badge/Tests-180%20passed-success)](https://github.com/AlexAgents/mycelium-core/tree/main/mycelium-core/tests) [![MkDocs](https://img.shields.io/badge/MkDocs-0969da?logo=materialformkdocs&logoColor=white)](https://github.com/AlexAgents/mycelium-core/tree/main/docs) [![Figma](https://img.shields.io/badge/Figma-Mockups-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/PWzJmLP7TrrbjcL6F85KoU/mycelium-core)
 
-[![RU](https://img.shields.io/badge/Language-RU-blue.svg)](README.md)
-[![EN](https://img.shields.io/badge/Language-EN-blue.svg)](README.en.md)
+[![README English](https://img.shields.io/badge/README-English-2ea44f?logo=readme&logoColor=white)](README.en.md) &nbsp; [![README Русский](https://img.shields.io/badge/README-Русский-0969da?logo=readme&logoColor=white)](README.md)
 
 **[Артефакты](#артефакты)** · **[Архитектура](#архитектура)** · **[Дизайн](#дизайн)** · **[Скриншоты](#скриншоты)** · **[Быстрый старт](#быстрый-старт)** · **[Конфигурация](#конфигурация)** · **[Безопасность](#инварианты-безопасности)** · **[FAQ](docs/src/reference/faq.ru.md)**
 

@@ -57,7 +57,9 @@ Building standalone executables, distribution, and troubleshooting.
 IDE setup, testing guide, code style, contributing, and Git workflow.
 
 ### [Reference](./reference/glossary.md)
-SRS, Changelog, Glossary (33 terms), FAQ (16 questions), License.
+SRS, User Stories (12 stories with Given/When/Then), Quality Metrics
+(23/23 SRS criteria passed), Changelog, Glossary (33 terms),
+FAQ (16 questions), License.
 
 ---
 

@@ -89,6 +89,7 @@ nav:
 
   - User Guide:
     - Overview: user-guide/overview.md
+    - Journey Map: user-guide/journey-map.md
     - Admin Tab: user-guide/admin-tab.md
     - Vote Tab: user-guide/vote-tab.md
     - Audit Tab: user-guide/audit-tab.md
@@ -182,6 +183,8 @@ nav:
   - Reference:
     - SRS: reference/srs.md
     - Documentation SRS: reference/srs-docs.md
+    - User Stories: reference/user-stories.md
+    - Quality Metrics: reference/quality-metrics.md
     - Changelog: reference/changelog.md
     - Glossary: reference/glossary.md
     - FAQ: reference/faq.md

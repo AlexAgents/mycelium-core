@@ -78,7 +78,7 @@ python scripts/build_docs.py
 mkdocs build --strict
 ```
 
-## Ключевые ссылки
+## Cсылки
 
 | Ресурс | Ссылка |
 |:---|:---|
