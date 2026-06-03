@@ -26,7 +26,7 @@
 
 ## Ссылки
 
-- **ADR:** [ADR-004 (Одна сессия — Одно голосование)](../../architecture/decisions/adr-004-one-session-one-vote.md)
-- **ADR:** [ADR-006 (Слоистая архитектура)](../../architecture/decisions/adr-006-layered-architecture.md)
+- **ADR:** [ADR-004 (Одна сессия — Одно голосование)](../../architecture/decisions/adr-004-one-session-one-vote.ru.md)
+- **ADR:** [ADR-006 (Слоистая архитектура)](../../architecture/decisions/adr-006-layered-architecture.ru.md)
 - **SRS:** Разделы 4.1–4.3 (Роли пользователей), 10.1–10.11 (Функциональные требования)
 - **Источник:** `src/diagrams/sources/uml/usecase/system-use-cases.puml`

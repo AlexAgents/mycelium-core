@@ -49,7 +49,7 @@ git commit -m "feat(scope): description"
 
 Следуйте формату
 [Conventional Commits](https://www.conventionalcommits.org/)
-(см. [Руководство для контрибьюторов](./contributing.md)).
+(см. [Руководство для контрибьюторов](./contributing.ru.md)).
 
 ### 3. Отправьте и откройте PR
 

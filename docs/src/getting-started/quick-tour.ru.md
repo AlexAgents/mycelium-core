@@ -133,6 +133,6 @@
 
 ## Следующие шаги
 
-- Детальная документация по вкладкам: см. [Руководство пользователя](../user-guide/overview.md).
-- Архитектура: [Обзор](../architecture/overview.md).
-- Безопасность: [SEC-проверки](../security/sec-checks.md).
+- Детальная документация по вкладкам: см. [Руководство пользователя](../user-guide/overview.ru.md).
+- Архитектура: [Обзор](../architecture/overview.ru.md).
+- Безопасность: [SEC-проверки](../security/sec-checks.ru.md).

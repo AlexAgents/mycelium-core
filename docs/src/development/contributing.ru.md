@@ -7,7 +7,7 @@
 ## Начало работы
 
 1. Клонируйте репозиторий и настройте среду
-   (см. [Настройка IDE](./setup.md)).
+   (см. [Настройка IDE](./setup.ru.md)).
 
 2. Создайте feature-ветку от `main`.
 3. Внесите изменения.
@@ -90,7 +90,7 @@ test(nonce): add thread safety test with 4 concurrent threads
 
 ## Чек-лист
 
-- [ ] Код соответствует [Руководству по стилю](./style-guide.md)
+- [ ] Код соответствует [Руководству по стилю](./style-guide.ru.md)
 - [ ] Все существующие тесты проходят (`python -m pytest -v`)
 - [ ] Добавлены новые тесты для новой функциональности
 - [ ] Нет импортов `web3` / `eth_account` в `src/ui/`
@@ -132,13 +132,13 @@ Closes #___
 
 Перед добавлением новых функций ознакомьтесь с:
 
-- [ADR-006 (Слоистая архитектура)](../architecture/decisions/adr-006-layered-architecture.md) —
+- [ADR-006 (Слоистая архитектура)](../architecture/decisions/adr-006-layered-architecture.ru.md) —
   UI ↔ AppController ↔ Services ↔ Infrastructure.
 
-- [ADR-007 (Выделение ErrorParser)](../architecture/decisions/adr-007-error-parser-separation.md) —
+- [ADR-007 (Выделение ErrorParser)](../architecture/decisions/adr-007-error-parser-separation.ru.md) —
   `AppController` должен оставаться компактным.
 
-- [Руководство по стилю](./style-guide.md) — именование, импорты, обработка ошибок.
+- [Руководство по стилю](./style-guide.ru.md) — именование, импорты, обработка ошибок.
 
 ---
 

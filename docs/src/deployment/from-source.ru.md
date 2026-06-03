@@ -8,7 +8,7 @@
 
 - Python 3.11+
 - Git
-- Бинарник Geth (см. [Установка](../getting-started/installation.md))
+- Бинарник Geth (см. [Установка](../getting-started/installation.ru.md))
 
 ---
 
